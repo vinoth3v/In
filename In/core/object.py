@@ -9,14 +9,14 @@ class Object(ObjectBase):
 	'''The IN Object class.
 
 	'''
-	
+
 	info = ''
 	help = ''
 	tooltip = ''
-	
+
 	prefix = None
 	suffix = None
-	
+
 	item_wrapper   = None
 	child_separator  = None
 	child_wrapper  = None
@@ -29,7 +29,7 @@ class Object(ObjectBase):
 	title = ''
 	visible    = True
 	weight = None
-	
+
 	# theme specific, per instance
 	default_children_view_mode = None
 
@@ -39,12 +39,12 @@ class Object(ObjectBase):
 		if items is None: items = {}
 
 		if 'id' in data:
-			data['id'] = data['id']
+			pass
 		else:
 			data['id'] = args.get('id', None) or self.__type__ + '_' + str(id(self))
 		data['name'] = data.get('name', None) or args.get('name', None) or str(data['id'])
-		
-		
+
+
 		self.css = []
 		self.attributes = {} #OrderedDict()
 		self.validations = []
@@ -65,20 +65,20 @@ class Object(ObjectBase):
 
 	def add(self, obj = None, type = 'Object', **args):
 		'''Add a Object to Object dict.'''
-		
+
 		bType = builtins.type
 		obj_type = type
-		
+
 		if bType(obj) is str:
 			# use first string as string
 			obj_type = obj
-		
+
 		if bType(type) is dict:
 			# second arg may be dict
 			data = type
 			args['data'] = data
-		
-			
+
+
 		if not isinstance(obj, Object):
 
 			#if 'weight' not in args:
@@ -87,14 +87,14 @@ class Object(ObjectBase):
 				obj = self.new(obj_type, **args)
 			except Exception as e1:
 				IN.logger.debug()
-			
+
 		if obj is not None and isinstance(obj, self.__allowed_children__ or self.__default_child__ or Object):
 			#print('old ', obj.id, obj.weight)
 			if obj.weight is None:
 				obj.weight = len(self)
 				#print('new ', obj.id, obj.weight)
 			self[obj.id] = obj
-			
+
 			return obj
 		else:
 			pass
@@ -225,7 +225,7 @@ class Object(ObjectBase):
 
 		# get the class type
 		objclass = IN.register.get_class(type, 'Object')
-		
+
 		if objclass is None:
 			# use the default
 			objclass = Object
@@ -233,8 +233,8 @@ class Object(ObjectBase):
 		obj = objclass(*pargs, **kargs)
 
 		return obj
-	
-		
+
+
 	#def __del__(self):
 		##del self.theme_output
 		#self.theme_output = None
