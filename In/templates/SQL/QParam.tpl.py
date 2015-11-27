@@ -1,1 +1,0 @@
-<%= theme_output['param_key'] %/>

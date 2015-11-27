@@ -1,1 +1,0 @@
-<%= theme_output['join_type'] %/> <%= theme_output['table'] %/> ON <%= theme_output['condition'] %/></% > 

@@ -1,1 +1,0 @@
-<%= itm.sql['field'] + ' ' + itm.sql['orderby'] %/>

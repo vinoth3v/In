@@ -1,1 +1,0 @@
-<%= theme_output['field'] %/> <%= theme_output['op'] %/> <%= theme_output['param_key'] %/>

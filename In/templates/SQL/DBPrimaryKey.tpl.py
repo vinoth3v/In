@@ -1,1 +1,0 @@
-PRIMARY KEY (<%= theme_output['output']['children'] %/>)

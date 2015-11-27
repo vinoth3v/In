@@ -1,1 +1,0 @@
-<%= itm.name %/>  <%= itm.field_type %/> ( <%= itm.length %/> )

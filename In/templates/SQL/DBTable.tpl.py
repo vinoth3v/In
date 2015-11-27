@@ -1,1 +1,0 @@
-<%= theme_output['table_name'] %/> <%= theme_output['alias'] %/>
