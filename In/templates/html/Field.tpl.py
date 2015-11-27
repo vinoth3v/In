@@ -1,0 +1,1 @@
+<div <%= attributes %>><%= title %><div class="field-value"><%= value %></div><%= children %></div>

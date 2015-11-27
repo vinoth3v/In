@@ -1,0 +1,1 @@
+<li <%= attributes %>><%= value %><%= children %></li>

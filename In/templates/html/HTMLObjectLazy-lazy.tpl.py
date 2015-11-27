@@ -1,0 +1,1 @@
+<div id="<%= id %>" class="ajax-lazy" data-delay="<%str= delay %>" data-args='<%= args %>'></div>

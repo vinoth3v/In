@@ -1,0 +1,1 @@
+<div <%= attributes %>><label for="<%= id %>"><%= title %> </label><%= children %> <%= error_message %></div>

@@ -1,0 +1,1 @@
+<%= theme_output['name'] %/> = <%= theme_output['content']['value'] %/>

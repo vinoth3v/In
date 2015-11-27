@@ -1,0 +1,1 @@
+<label for="<%= id %>"><%= title %></label><input <%= attributes %> /><div class="info field-info i-text-muted"><%= info %></div><%= error_message %>
