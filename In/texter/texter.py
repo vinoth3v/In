@@ -70,7 +70,7 @@ class RemoveScriptTexter(Texter):
 	
 	def format(self, text, config):
 		soup = BeautifulSoup(text, IN.texter.html_parser)
-		for elem in soup('script'):
+		for elem in soup.findAll('script'):
 			elem.extract()
 		return str(soup) # we just need to correct
 
@@ -109,11 +109,15 @@ class URLToLinkTexter(Texter):
 	def _format_tag(self, child):
 		
 		if child.name is None: # string
-			output = self._format(str(child))
+			old_output = str(child)
+			output = self._format(old_output)
+			
+			if old_output == output:
+				return
 			
 			sub_soup = BeautifulSoup(output, IN.texter.html_parser)
 			child.replace_with(sub_soup)
-
+			
 		elif child.name in self.ignore_tags:
 			return
 		else:
@@ -193,7 +197,11 @@ class IncludeEntityTexter(Texter):
 	def _format_tag(self, child):
 		
 		if child.name is None: # string
-			output = self._format(str(child))
+			old_output = str(child)
+			output = self._format(old_output)
+			
+			if old_output == output:
+				return
 			
 			sub_soup = BeautifulSoup(output, IN.texter.html_parser)
 			child.replace_with(sub_soup)

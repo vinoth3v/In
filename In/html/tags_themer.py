@@ -1,3 +1,5 @@
+import html
+
 from In.themer.object_themer import ObjectThemer
 
 
@@ -58,32 +60,22 @@ class HTMLFieldThemer(ObjectThemer):
 
 @IN.register('InputField', type = 'Themer')
 class InputFieldThemer(HTMLFieldThemer):
-
-	pass
+	''''''
 
 
 @IN.register('TextBox', type = 'Themer')
 class TextBoxThemer(InputFieldThemer):
 	''''''
 	
-	#def theme_plateit(self, obj, format, view_mode, args):
+	def theme_value(self, obj, format, view_mode, args):
+		value = super().theme_value(obj, format, view_mode, args)
+		value = html.escape(value, quote = True)
+		return value
 
-		#theme_output = obj.theme_current_output
-
-		## use merged version of children
-		#args['children'] = theme_output['output']['children']
-
-		##output = self.__template__.safe_substitute(args)
-		#output = self.template_string.format_map(args)
-		##output = self.template_string % args
-
-		## set the final output
-		#theme_output['output']['final'] = output
 
 @IN.register('TextArea', type = 'Themer')
 class TextAreaThemer(InputFieldThemer):
-
-	pass
+	''''''
 	
 #@IN.register('Password', type = 'Themer')
 #class PasswordThemer(TextBoxThemer):

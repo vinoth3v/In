@@ -90,6 +90,7 @@ class DefaultStringFieldFormatter(FieldFormatter):
 				si = sorted(lang_value.items(), key = lambda o: int(o[0]))
 				for idx_value in si:
 					text = str(idx_value[1]['value'])
+					
 					text = texter.format(text, texter_style)
 					
 					if link_to_entity:

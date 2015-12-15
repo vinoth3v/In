@@ -1,5 +1,5 @@
 import calendar
-
+import html
 import datetime
 
 class HTMLObject(Object):
@@ -246,8 +246,11 @@ class TextBox(InputField):
 		if self.required:
 			self.attributes['required'] = None # no value
 		self.attributes['size'] = self.size
+		
+		self.attributes['value'] = html.escape(self.attributes['value'])
 
 		return self.attributes
+
 
 class TextBoxEmail(TextBox):
 	__input_type__ = 'email'

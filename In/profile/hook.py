@@ -1,24 +1,23 @@
 import os
 
 @IN.hook
-def page_menu_tab(context):
+def page_menu_tab_nabar___edit_anything_after(context):
 	
 	tab = context.page_menu_tab
 	request = context.request
 	path_parts = context.request.path_parts
 	
-	if len(path_parts) == 4 or len(path_parts) == 5:
-		if path_parts[0] == 'nabar' and path_parts[1].isnumeric() and path_parts[2] == 'edit':
+	if path_parts[1].isnumeric():
 
-			last = path_parts[3]			
-			entity_id = path_parts[1]
-			
-			li = tab.add('Li', {
-				'css' : ['i-active' if last == 'profile' else '']
-			}).add('Link', {
-				'href' : ''.join(('/nabar/', entity_id, '/edit/profile/!general')),
-				'value' : s('Profile'),
-			})
+		last = path_parts[3]
+		entity_id = path_parts[1]
+		
+		li = tab.add('Li', {
+			'css' : ['i-active' if last == 'profile' else '']
+		}).add('Link', {
+			'href' : ''.join(('/nabar/', entity_id, '/edit/profile/!general')),
+			'value' : s('Profile'),
+		})
 		
 @IN.hook
 def entity_insert_Profile_general(entity):
@@ -41,9 +40,15 @@ def update_nabar_info(entity):
 		changed = False
 		
 		try:
+			
 			name = entity['field_nickname'].value[''][0]['value'].strip()
-			if name and name != nabar.name:
-				nabar.name = name
+			
+			texter = IN.texter		
+			
+			name_plain = texter.format(name, 'nochange')
+			
+			if name_plain and name_plain != nabar.name:
+				nabar.name = name_plain
 			
 			changed = True
 		except Exception as e1:

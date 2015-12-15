@@ -857,6 +857,14 @@ class FieldModel(FieldModelBase):
 				if col != 'id': # id is serial primary key # ignore it on insert
 					column_keys.append(col)
 			
+			# hack: fix the idx value str to int
+			for lang, lang_value in field_values.items():
+				new_field_values = {}
+				for idx, field_value in lang_value.items():					
+					new_field_values[int(idx)] = field_value
+				
+				field_values[lang] = new_field_values
+			
 			new_idx = 0
 			qvalues = []
 			for lang, lang_value in field_values.items():				

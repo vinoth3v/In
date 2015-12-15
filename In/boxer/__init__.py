@@ -14,19 +14,25 @@ class BoxEngine:
 		'''Add boxes to page'''
 		
 		boxes = IN.APP.decide_page_boxes(context, page, format)
+		
 		IN.hook_invoke('decide_page_boxes_alter', boxes, context, page, format)
 		
 		if boxes:
+			_Box = Box
+		
 			for b in boxes:
 				box = b[2]
-				if type(box) is dict: # create instance from args
+				type_box = type(box)
+				
+				if type_box is dict: # create instance from args
 					box['id'] = b[0]
-					
 					if 'type' not in box:
 						box['type'] = 'Box'
-					box = Box.new(**box)
-				if type(box) is str: # load this box
+					box = _Box.new(**box)
+					
+				if type_box is str: # load this box
 					box = self.load_box(box)
+					
 				page.add(box, panel = b[1])
 
 	def load_box(self, key, args = None):

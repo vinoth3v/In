@@ -10,46 +10,50 @@ __app_dir__ = 'app'
 
 class ApplicationBase:
 	'''Base Application'''
-	
+
 
 class Application(ApplicationBase):
-	
+
 	def __init__(self, app_path):
 
 		self.initialized = False
-		
-		self.app_path = app_path
-		
-		self.config_file = app_path + '/config/config.py'
 
-		conf_path, conf_filename = os.path.split(self.config_file)
+		self.app_path = app_path
+
+		conf_path, conf_filename = os.path.split(app_path + '/config/config.py')
 		conf_filename, conf_ext = os.path.splitext(conf_filename)
-		conf_f, conf_filename, conf_desc = imp.find_module(conf_filename, [conf_path])
+
+		try:
+			conf_f, conf_filename, conf_desc = imp.find_module(conf_filename, [conf_path])
+		except ImportError as e:
+			IN.logger.debug()
+			raise RuntimeError('Unable to import IN config.')
+
 		self.config = imp.load_module(conf_filename, conf_f, conf_filename, conf_desc)
-		
+
 		# set global timezone
 		os.environ['TZ'] = self.config.timezone_name
 		time.tzset()
 
-		self.app_path = self.config.app_root + os.sep
+		#self.app_path = self.config.app_root + os.sep
 
 		sys.path.append(self.app_path + '/themes/')
 		sys.path.append(self.app_path + '/addons/')
-		sys.path.append(self.app_path + '/vendor/')
+		#sys.path.append(self.app_path + '/vendor/')
 
 		# set the debug mode to true or false based on the configuration
 		IN.debug = self.config.debug_mode
-		
+
 		self.scope  = 'Global'  #default Scope to Global     # future use
 		self.access = 'Public'  #default Access to Public    # future use
 		self.version = IN.__version__ #default to IN Version
 
 		# set the Application Object to IN
 		IN.APP = self
-		
-		
+
+
 		self.static_cache = {}
-		
+
 		# contains all the actions built for this application.
 		# TODO: memory !!!
 		self.actions = None
@@ -70,7 +74,7 @@ class Application(ApplicationBase):
 		'''per app based addons. load them on app init.
 		'''
 		self.load_addons()
-		
+
 		self.context_pool = In.core.context.ContextPool()
 
 		# start the event
@@ -97,40 +101,40 @@ class Application(ApplicationBase):
 
 		IN.stringer = In.stringer.Stringer()
 		IN.cacher = In.core.cacher.CacherEngine()
-		
+
 		# init default cacher
 		IN.cacher.default
-		
+
 		IN.valuator = In.core.valuator.ValuatorEngine()
-		
+
 		IN.themer = In.themer.INThemeEngine(self.config.default_theme_name)
-		
+
 		IN.boxer = In.boxer.BoxEngine()
-		
+
 		IN.former = In.former.FormerEngine()
-		
+
 		IN.fielder = In.field.FielderEngine()
 		IN.entitier = In.entity.EntitierEngine()
-		
+
 		IN.texter = In.texter.TexterEngine()
 		IN.mailer = In.mailer.Mailer()
-		
+
 		# In.nabar is module
 		# IN.nabar is Object
 		# context.nabar is current nabar
 		IN.nabar = In.nabar.AccountAuth()
-		
+
 		IN.commenter = In.comment.Commenter()
-		
+
 		# process the registers after In, app, application init.
 		IN.register.process_registers()
-		
+
 		IN.hook_invoke('In_app_init', self)
-		
+
 		IN.hook_invoke('__In_app_init__', self)
-		
+
 		self.initialized = True
-		
+
 	def addon_enabled(self, name):
 		'''TODO:
 		'''
@@ -170,7 +174,7 @@ class Application(ApplicationBase):
 
 		self.load_addons()
 		return True
-	
+
 	def load(self):
 		#self.__load_configs()
 		self.load_addons()
@@ -188,8 +192,19 @@ class Application(ApplicationBase):
 
 	def decide_page_boxes(self, context, page, format):
 		'''Return boxes dynamically based on path/nabar/role/...'''
-		return
-	
+		
+		boxes = []
+		
+		path_hook_tokens = context.request.path_hook_tokens()
+		
+		for hook in path_hook_tokens:
+			IN.hook_invoke('page_box_' + hook, boxes, context, page, format)
+		
+		# hook by all path
+		IN.hook_invoke('page_box', boxes, context, page, format)
+		
+		return boxes
+
 	def decide_page_assets(self, context, page, format):
 		'''add/modify css js'''
 		return
@@ -225,12 +240,12 @@ class Application(ApplicationBase):
 class WSGIApplication(Application):
 	'''IN WSGIApplication class. '''
 
-	
-	
+
+
 	def __call__(self, environ, start_response):
-		
+
 		#time.sleep(.6)
-		
+
 		#### Hello world test
 		#status = '200 OK'
 		#output = 'Hello World!'.encode('utf-8')
@@ -251,7 +266,7 @@ class WSGIApplication(Application):
 
 		#sys.stdout = open(os.devnull, 'w')
 		# test
-		
+
 		self.ensure_environ(environ)
 
 		try:
@@ -270,13 +285,13 @@ class WSGIApplication(Application):
 
 		# handle the request
 		#self.handle_request(context)
-		
+
 		# add context to pool
-		
+
 		self.context_pool.put(context)
-		
+
 		#stime = datetime.datetime.now()
-		
+
 		# start this greenlet
 		# TODO
 		In_output = context.switch()
@@ -288,13 +303,13 @@ class WSGIApplication(Application):
 		#ms = etime - stime
 		#IN.logger.debug('Context time {diff}', {'diff' : ms})
 
-		
+
 		# delete and free this context
 		try:
 			self.context_pool.free(context)
 		except Exception:
 			IN.logger.debug()
-		
+
 
 		return In_output
 
@@ -331,10 +346,6 @@ class WSGIApplication(Application):
 		'''Return theme name dynamically based on path/nabar/role/...'''
 		return self.config.default_theme_name
 
-	def decide_page_boxes(self, context, page, format):
-		'''Return boxes dynamically based on path/nabar/role/...'''
-		return
-	
 	def decide_page_assets(self, context, page, format):
 		'''add/modify css js'''
 		return
@@ -347,6 +358,6 @@ class WSGIApplication(Application):
 
 	def action_page_not_found(self, context):
 		return In.action.__page_not_found_action__()
-	
-	
+
+
 

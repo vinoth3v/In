@@ -21,7 +21,7 @@ class TexterEngine:
 		
 		try:
 			if style not in self.texter_styles:
-				return ''
+				return text
 			style_texters = self.texter_styles[style]
 			for texter_config in style_texters:
 				try:

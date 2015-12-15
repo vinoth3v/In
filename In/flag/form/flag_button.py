@@ -253,7 +253,7 @@ class FlagButtonFormFormer(FormFormer):
 				'css' : [
 					'ajax',
 					'i-button i-button-small',
-					'flag-button flag-' + flag_type_entity.type,
+					'flag-button flag-type-' + flag_type_entity.type, # adblock hides .flag-like
 					'-'.join(('flag', flag_type_entity.type, key))
 				],
 				'attributes' : {'data-ajax_partial' : 1},

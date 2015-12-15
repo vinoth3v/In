@@ -44,36 +44,41 @@ class BoxPageMenuTabThemer(BoxThemer):
 		
 		context = args['context']
 		
-		org_path_tokenized = context.request.path_tokenized
-		path_tokenized = org_path_tokenized.replace('*', '_')
-		path_tokenized = path_tokenized.replace('/', '_')
+		#org_path_tokenized = context.request.path_tokenized
+		#path_tokenized = org_path_tokenized.replace('*', '_')
+		#path_tokenized = path_tokenized.replace('/', '_')
 		
-		# hook by path
-		IN.hook_invoke('page_menu_tab_' + path_tokenized, context)
+		## hook by path
+		#IN.hook_invoke('page_menu_tab_' + path_tokenized, context)
 		
-		# hook by anything_after path
+		## hook by anything_after path
 		
-		# content/*/edit
-		# content___edit_anything_after
-		# content___anything_after
-		# content_anything_after
+		## content/*/edit
+		## content___edit_anything_after
+		## content___anything_after
+		## content_anything_after
 		
-		token_paths = org_path_tokenized.split('/')
-		while(token_paths):
+		#token_paths = org_path_tokenized.split('/')
+		#while(token_paths):
 			
-			new_token_path = '/'.join(token_paths)
-			new_token_path = new_token_path.replace('*', '_')
-			new_token_path = new_token_path.replace('/', '_')
+			#new_token_path = '/'.join(token_paths)
+			#new_token_path = new_token_path.replace('*', '_')
+			#new_token_path = new_token_path.replace('/', '_')
 			
-			new_token_path += '_anything_after'
+			#new_token_path += '_anything_after'
 			
-			#print(new_token_path)
+			##print(new_token_path)
 			
-			IN.hook_invoke('page_menu_tab_' + new_token_path, context)
+			#IN.hook_invoke('page_menu_tab_' + new_token_path, context)
 			
-			#token_paths = token_paths[:-1]
-			del token_paths[-1]
-			
+			##token_paths = token_paths[:-1]
+			#del token_paths[-1]
+		
+		path_hook_tokens = context.request.path_hook_tokens()
+		
+		for hook in path_hook_tokens:
+			IN.hook_invoke('page_menu_tab_' + hook, context)
+		
 		# hook by all path
 		IN.hook_invoke('page_menu_tab', context)
 		

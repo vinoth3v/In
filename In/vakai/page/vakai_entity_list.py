@@ -12,11 +12,17 @@ def action_handler_vakai_entity_list(context, action, entity_type, field, vakai_
 	
 	vakai_entity = IN.entitier.load_single('Vakai', vakai_id)
 	
+	if not vakai_entity:
+		context.not_found()
+		
 	entity_title = entitier.entity_title(vakai_entity)
 	
 	if entity_title:
 		context.page_title = entity_title
-		
+	
+	#TODO: it overrides weight property of vakai
+	vakai_entity.weight = -1
+	
 	context.response.output.add(vakai_entity)
 	
 	field_table = fielder.field_table(field)
@@ -38,6 +44,7 @@ def action_handler_vakai_entity_list(context, action, entity_type, field, vakai_
 			['f.value', vakai_id]
 		],
 		'limit' : limit,
+		'order' : {'e.created' : 'DESC'},
 	})
 	
 	pager = {

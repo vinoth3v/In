@@ -40,17 +40,24 @@ class RecoverChangePassword(Form):
 		nabar = entitier.load_single('Nabar', nabar_id)
 		
 		if not nabar:
+			IN.context.bad_request()
+			return
+		
+		# access
+		if not context.access('nabar_edit_password_own', nabar, False):
+			IN.context.access_denied()
 			return
 		
 		# nabar is not active yet
 		if nabar.status == IN.nabar.NABAR_STATUS_REGISTERED:
+			self.has_errors = True
+			self.error_message = s('Your account is newly registered and this E-mail address is not yet verified!')
 			return
 		
 		# nabar blocked
 		if nabar.status == IN.nabar.NABAR_STATUS_BLOCKED:
-			return
-		
-		if not context.access('nabar_edit_password_own', nabar, False):
+			self.has_errors = True
+			self.error_message = s('Sorry! But this account is Blocked! Please contact the site administrator for further assistance!' )
 			return
 		
 		try:
@@ -69,6 +76,8 @@ class RecoverChangePassword(Form):
 				'nabar_id' : nabar_id,
 			})
 			if cursor.rowcount == 0:
+				self.has_errors = True
+				self.error_message = s('Sorry! But this E-mail address is not active!' )
 				return
 			
 		except Exception as e:

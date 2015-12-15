@@ -38,12 +38,11 @@ class Object(ObjectBase):
 		if data is None: data = {}
 		if items is None: items = {}
 
-		if 'id' in data:
-			pass
-		else:
-			data['id'] = args.get('id', None) or self.__type__ + '_' + str(id(self))
-		data['name'] = data.get('name', None) or args.get('name', None) or str(data['id'])
+		if 'id' not in data:
+			data['id'] = '_'.join((self.__type__, str(id(self))))
 
+		if 'name' not in data:
+			data['name'] = str(data['id'])
 
 		self.css = []
 		self.attributes = {} #OrderedDict()

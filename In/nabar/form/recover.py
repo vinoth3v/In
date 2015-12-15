@@ -123,8 +123,6 @@ class FormRecoverFormer(FormFormer):
 		
 		form.error_message = s('Sorry! Unable to send the e-mail right now! Try again!')
 		form.has_errors = True
-		return
-
 
 	def submit(self, form, post):
 

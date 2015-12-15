@@ -144,7 +144,7 @@ class FormLoginFormer(FormFormer):
 					
 					# BLOCKED
 					if nabar.status == IN.nabar.NABAR_STATUS_BLOCKED:
-						form.error_message = s('Sorry! This account has been blocked! Please contact the site administrator!')
+						form.error_message = s('Sorry! But this account is Blocked! Please contact the site administrator for further assistance!')
 						form.has_errors = True
 						return
 					

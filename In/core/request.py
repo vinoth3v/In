@@ -41,6 +41,9 @@ class Request:
 		self.path_tokenized = self.path
 		self.path_tokenized_values = {}
 		
+		self.__path_hook_tokens__ = None
+		
+		
 		self.method = context.environ.get('REQUEST_METHOD', 'GET').upper()
 
 		self.args = {
@@ -206,3 +209,53 @@ class Request:
 		TODO:
 		'''
 		return True
+
+	def path_hook_tokens(self):
+		'''used to decide tabs, boxes by paths.
+		
+		# node/62094/edit
+		[
+			'node___edit',
+			'node___edit_anything_after',
+			'node___anything_after',
+			'node_anything_after'
+		]
+		
+		'''
+		
+		if self.__path_hook_tokens__ is not None: # prepare once
+			return self.__path_hook_tokens__
+		
+		tokens = []
+		
+		org_path_tokenized = self.path_tokenized
+		
+		if org_path_tokenized:
+			
+			path_tokenized = org_path_tokenized.replace('*', '_').replace('/', '_').replace('-', '_')
+			
+			tokens.append(path_tokenized)
+			
+			# hook by anything_after path
+			
+			# content/*/edit
+			# content___edit_anything_after
+			# content___anything_after
+			# content_anything_after
+			
+			token_paths = org_path_tokenized.split('/')
+			while(token_paths):
+				
+				new_token_path = '/'.join(token_paths)
+				new_token_path = new_token_path.replace('*', '_').replace('/', '_').replace('-', '_')
+
+				new_token_path += '_anything_after'
+				
+				tokens.append(new_token_path)
+				
+				#token_paths = token_paths[:-1]
+				del token_paths[-1]
+
+		self.__path_hook_tokens__ = tokens
+		pprint(333333333333333333, tokens)
+		return self.__path_hook_tokens__

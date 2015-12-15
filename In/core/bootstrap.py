@@ -1,3 +1,7 @@
+import sys
+
+if sys.version < '3.4':
+	raise RuntimeError('IN requires python version 3.4')
 
 import asyncio
 import greenlet
@@ -28,7 +32,7 @@ def s(text, args = None, lc = '', language = 'ta'):
 	'''
 	if args is None:
 		args = {}
-		
+
 	#text = str(text)
 
 	return text.format_map(args)

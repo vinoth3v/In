@@ -18,7 +18,7 @@ def nabar_action_handler_page_edit_login(context, action, entity_id, **args):
 	
 	logins = IN.entitier.select('NabarLogin', [['nabar_id', entity_id]])
 	
-	text = s('''You can use any of these following logins to login in to the site!''')
+	text = s('''You can use any of these following logins to login into this site!''')
 	
 	output = [text.join(('<div class="i-alert i-alert-success"><i class="i-icon-info-circle"></i> ', '</div>'))]
 	

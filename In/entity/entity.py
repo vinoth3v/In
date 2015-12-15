@@ -893,6 +893,8 @@ class EntityModel(EntityModelBase):
 
 			fielder = IN.fielder
 			for field_name, field in entity.items():
+				
+				pprint(field.value)
 
 				# set the entity id
 				field.entity_id = new_id
@@ -954,6 +956,7 @@ class EntityModel(EntityModelBase):
 			fielder = IN.fielder
 
 			for field_name, field in entity.items():
+						
 				# set the entity id
 				field.entity_id = entity.id
 				field.entity_type = entity.__type__
@@ -962,7 +965,7 @@ class EntityModel(EntityModelBase):
 
 				fielder.update(field, False)
 
-			if commit: # if not caller will handle the commit
+			if commit: # if not, caller will handle the commit
 				connection.commit()
 
 		except Exception as e:

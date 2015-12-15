@@ -4,10 +4,6 @@
 	<title><%= title %></title>
 	<%= head_tags %>
 
-	<link href="/files/libraries/uikit-2.18.0/dist/css/uikit.almost-flat.min.css" media="all" rel="stylesheet" />
-
-	<link href="/files/themes/alai/css/default.css" media="all" rel="stylesheet" />
-
 	<%= header_css %>
 	<%= header_js %>
 

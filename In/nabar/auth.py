@@ -539,6 +539,7 @@ class AccountAuth:
 			
 			context.response.output.add(form)
 			
+			# token processed
 			return True
 		except Exception as e:
 			IN.logger.debug()
@@ -623,6 +624,7 @@ class AccountAuth:
 			# redirect
 			context.response.output.add('TextDiv', {'value' : IN.APP.config.nabar_verified_message})
 
+			# token processed
 			return True
 		except Exception as e:
 			IN.logger.debug()

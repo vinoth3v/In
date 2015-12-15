@@ -6,23 +6,19 @@ def actions():
 	actns['nabar/register'] = {
 		'title' : 'Nabar Register',
 		'handler' : nabar_register,
-		'type' : 'tab', # | link | button | hidden | menu
 	}
 	actns['nabar/recover'] = {
 		'title' : 'Forgot Password',
 		'handler' : nabar_recover,
-		'type' : 'tab', # | link | button | hidden | menu
 	}
 	actns['nabar/login'] = {
 		'title' : 'Nabar Login',
 		'handler' : nabar_login,
-		'type' : 'tab', # | link | button | hidden | menu
 	}
 	# TODO: referrer only from same domain
 	actns['nabar/logout'] = {
 		'title' : 'Nabar logout',
 		'handler' : nabar_logout,
-		'type' : 'tab', # | link | button | hidden | menu
 	}
 	
 	
