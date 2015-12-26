@@ -611,6 +611,7 @@ class Condition:
 				op = op.join((' ', ' '))
 				return op.join((col, ''.join(('%(', param_key, ')s')))), where_values
 
+
 		q = []
 
 		for where in self.where:

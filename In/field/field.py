@@ -33,13 +33,13 @@ class FielderEngine:
 		self.field_types = {}
 		for field in IN.register.get_sub_classes_yield(Field):
 			self.field_types[field.__type__] = field
-		
-		
+
+
 		self.build_entity_field_config()
-		
+
 		# cache field table prefixes
 		self.table_prefix = {}
-		
+
 	def build_entity_field_config(self):
 		'''build the field config'''
 
@@ -74,27 +74,27 @@ class FielderEngine:
 			#else:
 				## use default model
 				#field_class.Model.model = self.field_model.get('default', {}).copy()
-				
-			
-			#field_class.Model.model['table_prefix'] = {} # lazy, 
-		
+
+
+			#field_class.Model.model['table_prefix'] = {} # lazy,
+
 	def bundle_fields(self, entity_type, bundle):
 		try:
 			return self.entity_field_config[entity_type][bundle]
 		except Exception as e:
 			return {}
-		
+
 	def field_config(self, entity_type, entity_bundle, field_name):
 		try:
 			return self.entity_field_config[entity_type][entity_bundle][field_name]
 		except KeyError as e:
 			return {}
-			
+
 	def field_table(self, field_name):
 		'''returns prefixed table name for this field name
 
 		prefix is depends on field_name'''
-		
+
 		try:
 			return self.table_prefix[field_name]
 		except KeyError:
@@ -102,9 +102,9 @@ class FielderEngine:
 
 			prefix = prefixes.get(field_name, None) or prefixes.get('field', None) or prefixes.get('default', '')
 			prefix = prefix + field_name
-			
+
 			self.table_prefix[field_name] = prefix
-			
+
 		return prefix
 
 	def load(self, entity_type, field_type, entity_ids, field_name):
@@ -131,16 +131,16 @@ class FielderEngine:
 	def delete(self, field, commit = True):
 		return field.Fielder.delete(field, commit)
 
-	def form_field(self, field_type, field_config, field_value = None):
+	def form_field(self, field_type, field_config, field_value = None, args = None):
 		'''returns form field based on field type field data'''
-		
-		return self.field_types[field_type].Fielder.form_field(field_config, field_value)
-		
+
+		return self.field_types[field_type].Fielder.form_field(field_config, field_value, args)
+
 	def __create_new_field__(self, entity_type, entity_bundle, field_type, field_name, status, weight, data):
 		'''Create a new field to entity and create field db table'''
 
 		connection = IN.db.connection
-		
+
 		try:
 
 			table = 'config.config_entity_field'
@@ -165,14 +165,14 @@ class FielderEngine:
 
 			# creates table in DB for this field if table not already exists
 			self.field_types[field_type].Model.__create_field_table__(field_name)
-			
+
 			# commit the changes
 			connection.commit()
-			
+
 			# clear field cache
 			self.entity_field_config = {}
 			self.build_entity_field_config()
-			
+
 			return True
 
 		except Exception as e:
@@ -185,22 +185,22 @@ class FielderEngine:
 		if cls is None:
 			cls = In.field.field_formatter.FieldFormatter # use the default
 		return cls
-		
+
 	#def field_formatter(self, entity_type, entity_bundle, view_mode, field_name):
 		#'''returns the field formatter object'''
 		## TODO: cache it
 		#field_config = self.field_config(field_name)
 		#field_type = field_config['field_type']
-		
+
 		#try:
 			#return self.entity_field_config[entity_type][entity_bundle][field_name]['display_config'][view_mode]['field_formatter']
 		#except KeyError as e:
 			#return {}
-		
-		
+
+
 	def field_display_config(self, entity_type, entity_bundle, view_mode, field_name):
 		'''returns the config for entity_type, entity_bundle, view_mode, field_name'''
-		
+
 		try:
 			return self.entity_field_config[entity_type][entity_bundle][field_name]['data']['display_config'][view_mode]
 		except KeyError as e:
@@ -211,172 +211,172 @@ class FielderEngine:
 				except KeyError as e:
 					pass
 			return {}
-		
+
 	def set_field_formatter_config(self, entity_type, entity_bundle, view_mode, field_name, config):
 		'''save the field formatter config'''
-		
+
 		# get config from DB
-		
+
 		table = 'config.config_entity_field'
-		
+
 		where = [
-			['entity_type', entity_type], 
+			['entity_type', entity_type],
 			['entity_bundle', entity_bundle],
 			['field_name', field_name],
 		]
-		
+
 		try:
-		
+
 			cursor = IN.db.select({
 				'tables' : table,
 				'columns' : ['data'],
 				'where' : where,
 			}).execute()
-			
+
 		except Exception as e:
 			raise e
-		
+
 		if cursor.rowcount != 1:
 			raise In.field.FieldExceptionInvalidField(s('Invalid field {field_name}', {'field_name' : field_name}))
 
 		data = cursor.fetchone()[0]
-		
+
 		# update
-		
+
 		if 'display_config' not in data:
 			data['display_config'] = {}
-		
+
 		if view_mode not in data['display_config']:
 			data['display_config'][view_mode] = {}
-		
+
 		data['display_config'][view_mode].update(config)
-		
+
 		# save config to DB
-		
+
 		data = json.dumps(data, skipkeys = True, ensure_ascii = False)
-		
+
 		set = [['data', data]]
-		
+
 		connection = IN.db.connection
-		
+
 		try:
-			
+
 			cursor = IN.db.update({
 				'table' : table,
 				'set' : set,
 				'where' : where,
 			}).execute()
-			
+
 			connection.commit()
-			
+
 		except Exception as e:
 			connection.rollback()
 			raise e
-			
+
 	def set_field_config_data(self, entity_type, entity_bundle, field_name, data):
 		'''save the field formatter config'''
-		
+
 		# get config from DB
-		
+
 		table = 'config.config_entity_field'
-		
+
 		where = [
-			['entity_type', entity_type], 
+			['entity_type', entity_type],
 			['entity_bundle', entity_bundle],
 			['field_name', field_name],
 		]
-		
+
 		try:
-		
+
 			cursor = IN.db.select({
 				'tables' : table,
 				'columns' : ['data'],
 				'where' : where,
 			}).execute()
-			
+
 		except Exception as e:
 			raise e
-		
+
 		if cursor.rowcount == 0:
 			db_data = {}
 		else:
 			db_data = cursor.fetchone()[0]
-		
+
 		# update
-		
+
 		db_data.update(data)
-		
+
 		data = db_data
-		
+
 		# save config to DB
-		
+
 		data = json.dumps(data, skipkeys = True, ensure_ascii = False)
-		
+
 		set = [['data', data]]
-		
+
 		connection = IN.db.connection
-		
+
 		try:
-			
+
 			cursor = IN.db.update({
 				'table' : table,
 				'set' : set,
 				'where' : where,
 			}).execute()
-			
+
 			connection.commit()
-			
+
 		except Exception as e:
 			connection.rollback()
 			raise e
-		
+
 	def supported_field_formatters(self, field_type):
-		
+
 		formatters = {}
-		
+
 		try:
 			types = IN.register.registered_classes_sorted[field_type]['FieldFormatter']
 			if not types:
 				types = []
 		except Exception as e:
 			IN.logger.debug()
-			
+
 		for cls in types:
 			formatters[cls.__name__] = cls.__info__
-		
+
 		# TODO: get formatters from base Field types
-		
+
 		# get the class type
 		field_class = IN.register.get_class(field_type, 'Field')
 		if field_class:
 			bases = field_class.__bases__
-		
+
 			for base in bases:
 				base_formatters = self.supported_field_formatters(base.__type__)
 				if base_formatters:
 					formatters.update(base_formatters)
-		
+
 		return formatters
-	
+
 	def get_enity_bundle_field_config_from_db(self, entity_type, entity_bundle, field_name = None):
 		'''always get fresh config from db'''
-		
+
 		config = {}
 
 		try:
-			
+
 			where = [
 				['entity_type', entity_type],
 				['entity_bundle', entity_bundle],
 			]
 			if field_name is not None:
 				where.append(['field_name', field_name])
-				
+
 			cursor = IN.db.select({
 				'table' : 'config.config_entity_field',
 				'where' : where
 			}).execute()
-			
+
 			if cursor.rowcount == 0:
 				return {}
 
@@ -399,8 +399,8 @@ class FielderEngine:
 		return config
 
 #********************************************************************
-#					Field 
-#********************************************************************	
+#					Field
+#********************************************************************
 
 
 
@@ -415,33 +415,33 @@ class FieldBase(Object, metaclass = FieldMeta):
 	'''
 	__allowed_children__ = None
 	__default_child__ = None
-	
+
 
 @IN.register('Field', type = 'Field')
 class Field(FieldBase):
 	'''Base Field class.
 
 	'''
-	
-	# Field id == name == field_name 
+
+	# Field id == name == field_name
 	@property
 	def field_name(self):
 		return self.id
-	
+
 	@field_name.setter
 	def field_name(self, name):
 		self.id = name
-		
+
 	def __init__(self, data = None, items = None, **args):
 
 		self.language = ''
 		self.entity_type = ''
 		self.entity_bundle = ''
-		
+
 		if data is None:
 			data = {}
-		
-		
+
+
 		super().__init__(data, items, **args)
 
 
@@ -453,7 +453,7 @@ class Field(FieldBase):
 		objclass = IN.register.get_class(type, 'Field')
 		if objclass is None:
 			objclass = Field
-			
+
 		obj = objclass(*pargs, **kargs)
 
 		return obj
@@ -475,7 +475,7 @@ class Field(FieldBase):
 
 #********************************************************************
 #					Field Fielder
-#********************************************************************	
+#********************************************************************
 
 
 class FieldFielderBase:
@@ -485,7 +485,7 @@ class FieldFielderBase:
 class FieldFielder(FieldFielderBase):
 	'''Base Field Fielder'''
 
-	
+
 	#field_type = 'Field'
 
 	def __init__(self, objcls, key, mem_type):
@@ -507,8 +507,8 @@ class FieldFielder(FieldFielderBase):
 				#'weight' : 0,
 				#'language' : '',
 			#}
-		
-			
+
+
 	@property
 	def cacher(self):
 		if self.__cacher__ is None:
@@ -519,15 +519,15 @@ class FieldFielder(FieldFielderBase):
 		'''Load fields values
 
 		'''
-		
+
 		if type(entity_ids) is int:
 			result = self.load_single(entity_type, entity_ids, field_name)
-			
+
 			return result
 
 		# default is load multiple, id can be any iterable
 		result = self.load_multiple(entity_type, entity_ids, field_name)
-		
+
 		return result
 
 	def load_single(self, entity_type, entity_id, field_name):
@@ -551,7 +551,7 @@ class FieldFielder(FieldFielderBase):
 			'entity_type' : entity_type,
 			'entity_id' : entity_id
 		}
-		
+
 		field = self.field_class(data)
 
 		return field
@@ -564,10 +564,10 @@ class FieldFielder(FieldFielderBase):
 		# TODO: use the cache?
 
 		entity_field_data = self.field_class.Model.load_multiple(entity_type, entity_ids, field_name)
-		
+
 		if not entity_field_data:
 			return None
-		
+
 		# initiate the field
 		for id, field_data in entity_field_data.items():
 			# pass instance attributes
@@ -578,11 +578,11 @@ class FieldFielder(FieldFielderBase):
 				'entity_type' : entity_type,
 				'entity_id' : id
 			}
-			
+
 			field = self.field_class(data)
 			entity_field_data[id] = field
-			
-		
+
+
 		return entity_field_data
 
 
@@ -615,7 +615,7 @@ class FieldFielder(FieldFielderBase):
 		# TODO: clear the cache
 		return field.Model.delete(field, commit)
 
-	def form_field(self, field_config, field_value = None):
+	def form_field(self, field_config, field_value = None, args = None):
 		'''returns form field based on field type field data'''
 		# not implemented error
 		return None
@@ -627,11 +627,11 @@ class FieldFielder(FieldFielderBase):
 	def prepare_update(self, field):
 		'''prepare the field submit values to update'''
 		pass
-	
+
 
 #********************************************************************
 #					Field Model
-#********************************************************************	
+#********************************************************************
 
 
 
@@ -655,33 +655,33 @@ class FieldModel(FieldModelBase):
 
 	'''
 
-	
+
 	#field_type = 'Field'
-	
+
 	field_model_cache = None
-	
+
 	@property
 	def model(self):
-		
+
 		if self.field_model_cache is not None:
 			# use cached version
 			return self.field_model_cache
-		
+
 		field_model = IN.fielder.field_model
-		
+
 		# use copied version, model may change based on field name
 		if self.field_type in field_model:
 			self.field_model_cache = field_model[self.field_type].copy()
 		else:
 			self.field_model_cache = field_model['default'].copy()
-		
+
 		return self.field_model_cache
-		
-		
+
+
 	def __init__(self, objcls, key, mem_type):
 		self.field_class = objcls
 		self.field_type = objcls.__type__
-		
+
 		# changed as property
 		#self.model = {} # will be set by fielder
 
@@ -739,7 +739,7 @@ class FieldModel(FieldModelBase):
 					if col == 'weight':
 						weight = value
 						continue
-						
+
 					values[col] = value
 
 				if not values:
@@ -766,7 +766,7 @@ class FieldModel(FieldModelBase):
 		try:
 
 			table = IN.fielder.field_table(field_name)
-			
+
 			columns = self.model['columns'].copy() # we modify
 			where = [
 				['entity_type', entity_type],
@@ -821,7 +821,7 @@ class FieldModel(FieldModelBase):
 					entity_field_data[language] = {}
 
 				entity_field_data[language][weight] = values
-				
+
 			return entities
 
 		except Exception as er:
@@ -842,36 +842,36 @@ class FieldModel(FieldModelBase):
 			entity_type = field.entity_type
 			entity_id = field.entity_id
 			created = datetime.datetime.now()
-			
+
 			field_values = field.value
 			if not field_values: # None or {}
 				return
 
 			table = IN.fielder.field_table(field.field_name)
-			
+
 			columns = self.model['columns']
 
 			column_keys = []
-			
+
 			for col in columns.keys():
 				if col != 'id': # id is serial primary key # ignore it on insert
 					column_keys.append(col)
-			
+
 			# hack: fix the idx value str to int
 			for lang, lang_value in field_values.items():
 				new_field_values = {}
-				for idx, field_value in lang_value.items():					
+				for idx, field_value in lang_value.items():
 					new_field_values[int(idx)] = field_value
-				
+
 				field_values[lang] = new_field_values
-			
+
 			new_idx = 0
 			qvalues = []
-			for lang, lang_value in field_values.items():				
-				for idx, field_value in lang_value.items():					
-					
+			for lang, lang_value in field_values.items():
+				for idx, field_value in lang_value.items():
+
 					rvalues = []
-					
+
 					for col in column_keys:
 						if col == 'weight':
 							# use new idx that starts from 0
@@ -881,7 +881,7 @@ class FieldModel(FieldModelBase):
 						if col == 'language':
 							rvalues.append(lang)
 							continue
-							
+
 						if col == 'entity_type':
 							rvalues.append(entity_type)
 							continue
@@ -891,11 +891,11 @@ class FieldModel(FieldModelBase):
 						if col == 'created':
 							rvalues.append(created)
 							continue
-							
+
 						rvalues.append(field_value.get(col, None))
-					
+
 					qvalues.append(rvalues)
-			
+
 			cursor = IN.db.insert({
 				'table' : table,
 				'columns' : column_keys,
@@ -915,7 +915,7 @@ class FieldModel(FieldModelBase):
 			raise e # re raise
 
 	def update(self, field, commit = True):
-		
+
 		# delete first
 		self.delete(field, commit)
 
@@ -930,11 +930,11 @@ class FieldModel(FieldModelBase):
 		connection = IN.db.connection
 
 		try:
-			
+
 			table = IN.fielder.field_table(field.field_name)
 			entity_type = field.entity_type
 			entity_id = field.entity_id
-			
+
 			cursor = IN.db.delete({
 				'table' : table,
 				'where' : [
@@ -969,7 +969,7 @@ class FieldModel(FieldModelBase):
 			weight smallint,
 			value text,
 			created timestamp without time zone,
-			status smallint DEFAULT 1			
+			status smallint DEFAULT 1
 		);''')
 
 		## index
@@ -978,7 +978,7 @@ class FieldModel(FieldModelBase):
 		#index_name = table.split('.')[-1]
 
 		#q.append(index_name + '_idx ')
-		
+
 		#q.append(' ON ' + table)
 		#q.append(' USING btree ')
 		#q.append(''' (
@@ -990,7 +990,7 @@ class FieldModel(FieldModelBase):
 		IN.db.execute(''.join(q))
 
 		# caller will commit
-		
+
 #@IN.hook
 #def __In_app_init__(app):
 	## set the Field
@@ -1000,60 +1000,60 @@ class FieldModel(FieldModelBase):
 
 #********************************************************************
 #					Field Themer
-#********************************************************************	
+#********************************************************************
 
 
 @IN.register('FieldBase', type = 'Themer')
 class FieldBaseThemer(In.themer.ObjectThemer):
 	'''base field themer'''
-		
+
 @IN.register('Field', type = 'Themer')
 class FieldThemer(FieldBaseThemer):
-	
+
 	@classmethod
 	def field_formatter(cls, field, format, view_mode, args):
 		'''returns field formatter for field type'''
-		
+
 		display_config = IN.fielder.field_display_config(field.entity_type, field.entity_bundle, view_mode, field.field_name)
-		
+
 		formatter = display_config.get('field_formatter', 'FieldFormatter')
 		formatter_class = IN.fielder.formatter_class(formatter)
-		
+
 		# TODO: cache it
-		
+
 		return In.field.FieldFormatter()
-		
+
 	def theme(self, field, format, view_mode, args):
 		theme_output = field.theme_current_output
-		
+
 		#formatter = self.field_formatter(field, format, view_mode, args)
-		
+
 		display_config = IN.fielder.field_display_config(field.entity_type, field.entity_bundle, view_mode, field.id)
-		
+
 		formatter_class = display_config.get('field_formatter', 'FieldFormatter')
 		formatter_class = IN.fielder.formatter_class(formatter_class)
-		
+
 		config = display_config.get('field_formatter_config', {})
-		
+
 		# TODO: cache it
 		formatter_obj = formatter_class()
-		
+
 		theme_output['content']['value'] = formatter_obj.format_value(field, format, view_mode, args, config)
 		theme_output['content']['title'] = formatter_obj.format_title(field, format, view_mode, args, config)
-		
+
 		if theme_output['content']['value'] == '':
 			field.visible = False
-		
+
 		field.css.append('field')
 		field.css.append(field.__type__)
 		field.css.append(field.name)
-		
+
 
 	def theme_process_variables(self, field, format, view_mode, args):
 		super().theme_process_variables(field, format, view_mode, args)
 
 		#field_config = IN.fielder.field_config(field.name)
-		
+
 	def theme_plateit(self, field, format, view_mode, args):
 		if args is None:
 			args = {}

@@ -94,13 +94,15 @@ class INThemeEngine:
 			args = {}
 
 		args['__theme_engine__'] = self
-
+		
+		if not obj.visible:
+			return ''
+			
 		args['context'] = args.get('context', IN.context)
 
 		#if isinstance(obj, Object):
 
-		if not obj.visible:
-			return ''
+		
 		
 		obj_themer = obj.Themer
 		

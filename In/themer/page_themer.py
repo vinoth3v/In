@@ -79,7 +79,7 @@ class PageThemer(ObjectThemer):
 				ajax_elements['ajax_page_replaceable'].add(obj[element])
 				
 		else:
-			# replace only one panel
+			# replace only these panels
 			panels = panel.split(',')
 			for panel in panels:
 				if panel in obj:

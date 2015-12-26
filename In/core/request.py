@@ -82,6 +82,8 @@ class Request:
 
 			post_data = cgi.FieldStorage(fp = context.environ['wsgi.input'], environ = context.environ, keep_blank_values = True )
 			
+			#pprint(post_data)
+			
 			process_file = In.file.process_uploaded_file
 			process_it = lambda data: process_file(data) if data.filename else data.value
 
@@ -257,5 +259,5 @@ class Request:
 				del token_paths[-1]
 
 		self.__path_hook_tokens__ = tokens
-		pprint(333333333333333333, tokens)
+		#pprint(tokens)
 		return self.__path_hook_tokens__

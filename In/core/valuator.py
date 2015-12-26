@@ -120,6 +120,12 @@ class Empty(Valuator):
 		# returning value itself makes it evaluates again
 		return [False, message] if value else [True]
 
+class NotEmpty(Valuator):
+	
+	def validate(self, value, message = ''):
+		# returning value itself makes it evaluates again
+		return [False, message] if not value else [True]
+
 class Length(Valuator):
 
 	def validate(self, value, length = 0, op = '=', mlength = 0, message = ''):

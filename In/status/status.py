@@ -58,7 +58,7 @@ class StatusEntitier(In.entity.EntityEntitier):
 			if entitier.access('delete', entity):
 				delete = Object.new(type = 'Link', data = {
 					'id' : 'delete-link-' + id_suffix,
-					'css' : ['no-ajax ajax-modal i-button i-button-small'], # no-ajax needed here or it bind twice
+					'css' : ['no-ajax ajax-modal i-button i-button-small i-float-right'], # no-ajax needed here or it bind twice
 					'value' : s('delete'),
 					'href' : '/'.join(('/status', str(entity.id), 'delete', 'confirm')),
 					'weight' : 1,
@@ -113,7 +113,9 @@ class StatusThemer(In.entity.EntityThemer):
 	def theme_process_variables(self, obj, format, view_mode, args):
 		super().theme_process_variables(obj, format, view_mode, args)
 		
-		nabar = IN.entitier.load('Nabar', obj.nabar_id)
+		entitier = IN.entitier
+		
+		nabar = entitier.load('Nabar', obj.nabar_id)
 		
 		args['nabar_name'] = nabar.name
 		args['nabar_id'] = nabar.id
@@ -128,6 +130,13 @@ class StatusThemer(In.entity.EntityThemer):
 		container_id = IN.commenter.get_container_id(obj)
 		entity_type = 'Status'
 		entity = obj
+		
+		args['to_entity'] = '' 
+		
+		if obj.to_entity_type == 'Nabar' and obj.to_entity_id != obj.nabar_id:
+			to_nabar = entitier.load('Nabar', obj.to_entity_id)
+			args['to_entity'] = ''.join(('<i class="i-icon-angle-double-right"></i> <a href="/nabar/', str(to_nabar.id), '">', to_nabar.name, '</a>'))
+			
 		if container_id:
 			
 			data = {

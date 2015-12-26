@@ -894,8 +894,6 @@ class EntityModel(EntityModelBase):
 			fielder = IN.fielder
 			for field_name, field in entity.items():
 				
-				pprint(field.value)
-
 				# set the entity id
 				field.entity_id = new_id
 				field.entity_type = entity.__type__

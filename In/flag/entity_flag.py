@@ -48,6 +48,7 @@ def entity_model():
 					'id' : {},
 					'type' : {},
 					'created' : {},
+					'changed' : {},
 					'status' : {},
 					'flag_status' : {},
 					'nabar_id' : {},

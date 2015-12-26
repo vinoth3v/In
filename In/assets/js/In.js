@@ -80,7 +80,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
       document.body.appendChild(tag);
     }
   };
-	
+
   IN.addStyle = function(styles) {
     if (typeof styles === 'string') {
       styles = [styles]
@@ -210,6 +210,8 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
     //}
 
     var $el = $(element);
+	var n = $(element).attr('name');
+	var i = $(element).attr('id');
 
     if (!ajax_options.event) {
         var ajax_event = $el.data('ajax_event');
@@ -218,8 +220,11 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
         } else {
             if ($el.is('form')) {
                 ajax_options['event'] = 'submit';
-            } else if ($el.is('select') || $el.is('input[type=file]')) {
-                ajax_options['event'] = 'change';
+            } else if ($el.is('select') ||
+				$el.is(':file') ||
+				$el.is(':checkbox') ||
+				$el.is(':radio')) {
+					ajax_options['event'] = 'change';
             }
             // use default
         }
@@ -257,7 +262,6 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
         }
       }
     }
-
 
     if (this.type == 'GET') {
       if ($el.hasClass('no-scroll')) {
@@ -311,7 +315,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
 
     // bind it
     $(ajax.element).on(ajax.event, function (event) {
-      return ajax.eventResponse(this, event);
+	  return ajax.eventResponse(this, event);
     });
 
     // If necessary, enable keyboard submission so that Ajax behaviors
@@ -425,7 +429,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
     var value = $(this.element).attr('value')
     var id = $(this.element).attr('id')
     if (id && value && !(id in options.data)) {
-        options.data[id] = value;
+        //options.data[id] = value; // v: checkbox value appears twice
     }
 
     if (this.clicked) {
@@ -433,7 +437,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
         var value = $(clicked).attr('value')
         var name = $(clicked).attr('name')
         if (name && value && !(name in options.data)) {
-            options.data[name] = value;
+            //options.data[name] = value; // v: checkbox value appears twice
         }
     }
 
@@ -483,13 +487,14 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
       // value is included in the submission. As per above, submissions that use
       // $.ajax() are already serialized prior to the element being disabled, so
       // this is only needed for IFRAME submissions.
+
       var v = $.fieldValue(this.element);
       if (v !== null) {
         options.extraData[this.element.name] = v;
       }
     }
 
-    // Disable the element that received the change to prevent nabar interface
+    // Disable the element that received the change to prevent user interface
     // interaction while the Ajax request is in progress. ajax.ajaxing prevents
     // the element from triggering a new request, but does not prevent the nabar
     // from changing its value.
@@ -850,6 +855,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
                           $.ajax({
                               url: $el.data('autocomplete_url') + '/!' + encodeURIComponent(query),
                               type: 'GET',
+                              data : $el.data('autocomplete_url_data'),
                               error: function() {
                                 callback();
                               },

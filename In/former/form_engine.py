@@ -89,7 +89,7 @@ class FormerEngine:
 			return None
 		
 		# invoke form hooks
-		prefix = 'form_load_form'
+		prefix = 'form_load'
 
 		# hook form_load		
 		IN.hook_invoke(prefix, form, post, args)
@@ -165,18 +165,18 @@ class FormerEngine:
 		
 		if form.partial:
 			
-			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_validate_partial')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_validate_partial')), form, post)
 			former.validate_partial(form, post)
-			IN.hook_invoke('_'.join(('form_process', form_type, 'validate_partial')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'validate_partial')), form, post)
 			
 		else:	
 			
 			# validate the form fields
 			self.validate_form_fields(form)
 
-			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_validate')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_validate')), form, post)
 			former.validate(form, post)
-			IN.hook_invoke('_'.join(('form_process', form_type, 'validate')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'validate')), form, post)
 
 	def submit(self, form, post):
 		
@@ -188,18 +188,18 @@ class FormerEngine:
 			# prepare data to submit
 			former.submit_prepare_partial(form, post)
 			
-			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_submit_partial')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_submit_partial')), form, post)
 			former.submit_partial(form, post)
-			IN.hook_invoke('_'.join(('form_process', form_type, 'submit_partial')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'submit_partial')), form, post)
 			
 		else:
 			
 			# prepare data to submit
 			former.submit_prepare(form, post)
 			
-			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_submit')), form)			
-			former.submit(form, post)			
-			IN.hook_invoke('_'.join(('form_process', form_type, 'submit')), form)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'pre_submit')), form, post)
+			former.submit(form, post)
+			IN.hook_invoke('_'.join(('form_process', form_type, 'submit')), form, post)
 
 	def validate_form_fields(self, obj, form = None):
 		'''Valuate all form fields'''

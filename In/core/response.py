@@ -86,6 +86,8 @@ class PageResponse(ObjectResponse):
 
 		ajax_args = context.request.ajax_args or {}
 		
+		#TODO: fix: content panel classes not updated if panel supplied
+		
 		# theme and return only ajax elements
 		panel = None
 		if 'panel' in ajax_args:
@@ -99,7 +101,7 @@ class PageResponse(ObjectResponse):
 		
 		output.append({
 			'method' : 'title',
-			'args' : [IN.context.page_title or '']
+			'args' : [IN.context.page_title or IN.APP.config.app_title]
 		})
 		
 		output = {

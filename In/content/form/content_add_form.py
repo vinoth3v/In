@@ -28,6 +28,7 @@ class ContentAddForm(In.entity.EntityAddForm):
 						field_options[field_value] = nabar.name
 			
 			set.add('HTMLSelect', { # TextBox
+				'title' : s('Author'),
 				'id' : 'nabar',
 				'name' : 'nabar',
 				'value' : field_value,

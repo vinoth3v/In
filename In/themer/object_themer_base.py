@@ -41,7 +41,7 @@ class ObjectThemerBase:
 		'''
 
 	def theme_value(self, obj, format, view_mode, args):
-		return obj.value or obj.def_value
+		return obj.def_value if obj.value is None else obj.value
 
 	def theme_attributes(self, obj, format, view_mode, args):
 		'''Called when themer wants lets object theme its attributes.

@@ -39,11 +39,23 @@ def update_nabar_info(entity):
 		
 		changed = False
 		
+		name = None
+		
+		# use nic if available
 		try:
-			
 			name = entity['field_nickname'].value[''][0]['value'].strip()
+		except Exception as e1:
+			IN.logger.debug()
+		
+		# use name 
+		try:
+			if not name:
+				name = entity['field_name'].value[''][0]['value'].strip()
+		except Exception as e1:
+			IN.logger.debug()
 			
-			texter = IN.texter		
+		if name:
+			texter = IN.texter
 			
 			name_plain = texter.format(name, 'nochange')
 			
@@ -51,9 +63,7 @@ def update_nabar_info(entity):
 				nabar.name = name_plain
 			
 			changed = True
-		except Exception as e1:
-			IN.logger.debug()
-		
+			
 		try:
 			dob = entity['field_dob'].value[''][0]['value']
 			if dob != nabar.dob:

@@ -408,7 +408,8 @@ class EntitierEngine:
 				title = self.entity_title(entity)
 				if title:
 					context.page_title = text = IN.texter.format(title, 'default')
-	
+		
+		return entity
 	
 	def entity_page_edit(self, entity_type, entity_id, view_mode = 'full', **args):
 		'''disply form to edit the entity
@@ -451,7 +452,9 @@ class EntitierEngine:
 				title = self.entity_title(entity)
 				if title:
 					context.page_title = text = IN.texter.format(title, 'default')
-	
+		
+		return entity
+		
 	def entity_page_delete(self, entity_type, entity_id, **args):
 		'''disply form to edit the entity
 		
@@ -490,7 +493,9 @@ class EntitierEngine:
 			title = self.entity_title(entity)
 			if title:
 				context.page_title = text = IN.texter.format(title, 'default')
-	
+		
+		return entity
+		
 	def entity_title(self, entity):
 		return entity.Entitier.entity_title(entity)
 		

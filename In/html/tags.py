@@ -8,7 +8,7 @@ class HTMLObject(Object):
 
 	def get_attributes(self):
 		super().get_attributes()
-		if self.__always_add_id_attribute__:
+		if self.__always_add_id_attribute__ and 'id' not in self.attributes:
 			self.attributes['id'] = self.id
 
 		return self.attributes
@@ -99,7 +99,7 @@ class Ul(Tag):
 
 class Ol(Tag):
 	__tag__ = 'ol'
-	
+
 class Li(Tag):
 	__tag__ = 'li'
 
@@ -126,7 +126,7 @@ class Link(HTMLObject):
 		self.name = None
 
 		super().__init__(data, items, **args)
-		
+
 
 	def get_attributes(self):
 		super().get_attributes()
@@ -141,7 +141,7 @@ class Link(HTMLObject):
 class HTMLField(HTMLObject):
 
 	def __init__(self, data = None, items = None, **args):
-		
+
 		if data is None:
 			data = {}
 
@@ -149,15 +149,15 @@ class HTMLField(HTMLObject):
 		data['error_message'] = data.get('error_message', None)
 		data['has_errors'] = data.get('has_errors', None)
 		data['placeholder'] = data.get('placeholder', None)
-		
+
 		# wrap all input fields in div
 		if 'item_wrapper' not in data:
 			data['item_wrapper'] = Object.new('TextDiv')
 
 		super().__init__(data, items, **args)
-		
-		
-			
+
+
+
 	def get_value(self):
 		return self.value
 	def set_value(self, value):
@@ -189,7 +189,7 @@ class InputField(HTMLField):
 	def get_attributes(self):
 		super().get_attributes()
 
-		self.attributes['value'] = self.value or self.def_value
+		self.attributes['value'] = self.def_value if self.value is None else self.value
 		self.attributes['type'] = self.__input_type__
 		if self.placeholder:
 			self.attributes['placeholder'] = self.placeholder
@@ -202,11 +202,11 @@ class Submit(InputField):
 
 	__tag__ = 'button'
 	__input_type__ = 'submit'
-	
+
 	def __init__(self, data = None, items = None, **args):
 		data['item_wrapper'] = data.get('item_wrapper', None)
 		super().__init__(data, items, **args)
-		
+
 
 	def get_attributes(self):
 		super().get_attributes()
@@ -218,11 +218,11 @@ class Submit(InputField):
 class Button(InputField):
 
 	__tag__ = 'button'
-	
+
 	def __init__(self, data = None, items = None, **args):
 		data['item_wrapper'] = data.get('item_wrapper', None)
 		super().__init__(data, items, **args)
-		
+
 	def get_attributes(self):
 		super().get_attributes()
 		self.attributes['value'] = 'value'
@@ -247,7 +247,8 @@ class TextBox(InputField):
 			self.attributes['required'] = None # no value
 		self.attributes['size'] = self.size
 		
-		self.attributes['value'] = html.escape(self.attributes['value'])
+		
+		self.attributes['value'] = html.escape(str(self.attributes['value']))
 
 		return self.attributes
 
@@ -257,6 +258,35 @@ class TextBoxEmail(TextBox):
 
 class Password(TextBox):
 	__input_type__ = 'password'
+
+class TextBoxNumber(TextBox):
+	__input_type__ = 'number'
+	
+	min = 0
+	max = 1000
+	step = 1
+	
+	def get_attributes(self):
+		super().get_attributes()
+
+		self.attributes['min'] = self.min
+		self.attributes['max'] = self.max
+		self.attributes['step'] = self.step
+
+		return self.attributes
+
+
+#color
+#date
+#datetime
+#datetime-local
+#month
+#range
+#search
+#tel
+#time
+#url
+#week
 
 
 class TextArea(TextBox):
@@ -270,7 +300,7 @@ class TextArea(TextBox):
 	def get_attributes(self):
 		super().get_attributes()
 		self.attributes['rows'] = self.rows
-		
+
 		# no value in attributes
 		if 'value' in self.attributes:
 			del self.attributes['value']
@@ -297,19 +327,23 @@ class CheckBox(InputField):
 
 	def get_attributes(self):
 		super().get_attributes()
-		self.attributes['value'] = self.value or self.def_value
+		self.attributes['value'] = self.def_value if self.value is None else self.value
 
 		if self.checked:
 			self.attributes['checked'] = None
 
 		return self.attributes
 
+class RadioBox(CheckBox):
+	__input_type__ = 'radio'
+
+
 #@IN.register('html.select', type = 'Object')
 class HTMLSelect(HTMLField):
 	__tag__ = 'select'
-	
+
 	multiple = False
-	
+
 	def __init__(self, data = None, items = None, **args):
 		if data is None:
 			data = {}
@@ -368,25 +402,25 @@ class Options(HTMLField):
 		return self.attributes
 
 
-class RadioBox(CheckBox):
-	__input_type__ = 'radio'
-
-
 class RadioBoxes(HTMLObject):
+
+	child_additional_data = None
 
 	def __init__(self, data = None, items = None, **args):
 		self.options = {}
-		
+
 		super().__init__(data, items, **args)
 
 class CheckBoxes(HTMLObject):
 
+	child_additional_data = None
+
 	def __init__(self, data = None, items = None, **args):
-		self.multiple = True		
+		self.multiple = True
 		self.options = {}
 
 		super().__init__(data, items, **args)
-		
+
 		# value in list not found because of str to int types
 		# convert all to str as options dict keys are str
 		if self.value:
@@ -449,7 +483,7 @@ class HTMLTableHColumn(HTMLTableColumn):
 class HTMLTableRow(Tag):
 	__allowed_children__ = HTMLTableColumn
 	__tag__ = 'tr'
-	
+
 
 class HTMLTableRowContainer(Tag):
 	__allowed_children__ = HTMLTableRow
@@ -457,30 +491,30 @@ class HTMLTableRowContainer(Tag):
 
 class HTMLTableHeader(HTMLTableRowContainer):
 	__tag__ = 'thead'
-	
+
 class HTMLTableFooter(HTMLTableRowContainer):
 	__tag__ = 'tfoot'
-	
+
 class HTMLTableBody(HTMLTableRowContainer):
 	__tag__ = 'tbody'
 
 class HTMLTable(Tag):
 	__tag__ = 'table'
-	
+
 	def __init__(self, data = None, items = None, **args):
 		super().__init__(data, items, **args)
 
 		self.add('HTMLTableHeader', {
-			'id' : 'header', 
+			'id' : 'header',
 			'weight' : 1
 		})
 		self.add('HTMLTableBody', {
-			'id' : 'body', 
+			'id' : 'body',
 			'weight' : 2
 		})
 		self.add('HTMLTableFooter', {
-			'id' : 'footer', 
+			'id' : 'footer',
 			'weight' : 3
 		})
-		
+
 		self.css.append('i-table')

@@ -35,6 +35,7 @@ class ContentEditForm(In.entity.EntityEditForm):
 				form.error_message = s('Invalid Nabar!')
 			
 			set.add('HTMLSelect', { # TextBox
+				'title' : s('Author'),
 				'id' : 'nabar',
 				'name' : 'nabar',
 				'value' : field_value,
@@ -51,7 +52,7 @@ class ContentEditForm(In.entity.EntityEditForm):
 			})
 			
 			set.add('CheckBox', {
-				'label' : 'Published',
+				'label' : s('Published'),
 				'id' : 'published',
 				'value' : 1,	# returned value if checked
 				'checked' : post.get('published', 0) == '1' or entity.status > 0,
@@ -59,7 +60,7 @@ class ContentEditForm(In.entity.EntityEditForm):
 			})
 			
 			set.add('CheckBox', {
-				'label' : 'Featured content?',
+				'label' : s('Featured content?'),
 				'id' : 'featured',
 				'value' : 1,	# returned value if checked
 				'checked' : post.get('featured', 0) == '1' or entity.featured,
@@ -84,7 +85,7 @@ class ContentEditForm(In.entity.EntityEditForm):
 			set.add('Link', {
 				'value' : s('Delete'),
 				'href' : str(entity.id).join(('/node/', '/delete')),
-				'css' : ['i-button i-button-large i-button-danger']
+				'css' : ['i-button i-button-large i-button-danger i-float-right']
 			})
 			
 		set.add('Link', {

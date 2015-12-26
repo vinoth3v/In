@@ -19,12 +19,12 @@ class FormRegister(Form):
 
 		super().__init__(data, items, **args)
 
-		set = self.add('FieldSet',{
+		set = self.add('FieldSet', {
 			'id' : 'registerset',
 			'css' : ['i-form-row i-margin-large']
 		})
 
-		set.add('TextBox',{
+		set.add('TextBox', {
 			'id' : 'name',
 			'value' : post.get('name', ''),
 			'title' : s('Your name'),
@@ -33,7 +33,7 @@ class FormRegister(Form):
 			'validation_rule' : ['Length', 3, '>', 0, 'The name length should be greater than 3.'],
 			'css' : ['i-width-1-1 i-form-large']
 		})
-		set.add('TextBoxEmail',{
+		set.add('TextBoxEmail', {
 			'id' : 'email',
 			'value' : post.get('email', ''),
 			'title' : s('E-mail address'),
@@ -43,7 +43,7 @@ class FormRegister(Form):
 			'css' : ['i-width-1-1 i-form-large']
 		})
 
-		#set.add('TextBox',{
+		#set.add('TextBox', {
 			#'id' : 'nabarname',
 			#'value' : post.get('nabarname', ''),
 			#'title' : s('Login name'),
@@ -54,7 +54,7 @@ class FormRegister(Form):
 		pwd = post.get('password', '')
 		repwd = post.get('repassword', '')
 
-		set.add('Password',{
+		set.add('Password', {
 			'id' : 'password',
 			'value' : pwd,
 			'title' : s('Password'),
@@ -63,7 +63,7 @@ class FormRegister(Form):
 			'css' : ['i-width-1-1 i-form-large'],
 		})
 
-		set.add('Password',{
+		set.add('Password', {
 			'id' : 'repassword',
 			'value' : repwd,
 			'title' : s('Retype password'),
@@ -77,7 +77,7 @@ class FormRegister(Form):
 		options['female'] = s('Female')
 		options['shemale'] = s('Shemale')
 
-		set.add('RadioBoxes',{
+		set.add('RadioBoxes', {
 			'id' : 'gender',
 			'name' : 'gender',
 			'title' : s('Gender'),
@@ -87,7 +87,7 @@ class FormRegister(Form):
 		})
 
 		#options = OrderedDict()
-		set.add('DateSelect',{
+		set.add('DateSelect', {
 			'id' : 'dob',
 			'name' : 'dob',
 			'options' : options,
@@ -98,7 +98,7 @@ class FormRegister(Form):
 			'css' : ['i-width-1-1 i-form-large'],
 		})
 
-		set = self.add('FieldSet',{
+		set = self.add('FieldSet', {
 			'id' : 'actionset',
 			'css' : ['i-form-row i-text-primary']
 		})
@@ -124,7 +124,7 @@ class FormRegister(Form):
 			#'css' : ['']
 		#})
 
-		set = self.add('FieldSet',{
+		set = self.add('FieldSet', {
 			'id' : 'linkset',
 			'css' : ['i-form-row']
 		})

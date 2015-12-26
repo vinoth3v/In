@@ -1,6 +1,6 @@
 
 @IN.hook
-def form_load_form(form, post, args):
+def form_load(form, post, args):
 
 	field_name = get_form_bot_field(form.__type__)
 

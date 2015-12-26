@@ -1,11 +1,11 @@
 import html
-
+import copy
 from In.themer.object_themer import ObjectThemer
 
 
 @IN.register('HTMLObject', type = 'Themer')
 class HTMLObjectThemer(ObjectThemer):
-	pass
+	''''''
 
 builtins.HTMLObjectThemer = HTMLObjectThemer
 
@@ -18,13 +18,11 @@ class TagThemer(ObjectThemer):
 
 @IN.register('Text', type = 'Themer')
 class TextThemer(TagThemer):
-
-	pass
+	''''''
 
 @IN.register('TextDiv', type = 'Themer')
 class TextDivThemer(TagThemer):
-
-	pass
+	''''''
 
 @IN.register('HTMLField', type = 'Themer')
 class HTMLFieldThemer(ObjectThemer):
@@ -37,7 +35,7 @@ class HTMLFieldThemer(ObjectThemer):
 				cls = excls['form_input_error_message']
 			else:
 				cls = ''
-			
+
 			if obj.error_message:
 				args['error_message'] = ''.join(('<div class="', cls, '">', obj.error_message, '</div>'))
 			else:
@@ -47,7 +45,7 @@ class HTMLFieldThemer(ObjectThemer):
 
 		args['title'] = obj.title or ''
 		args['info'] = obj.info or ''
-		
+
 
 	def theme_css(self, obj, item_index=0, ref=2):
 		if obj.has_errors:
@@ -66,9 +64,11 @@ class InputFieldThemer(HTMLFieldThemer):
 @IN.register('TextBox', type = 'Themer')
 class TextBoxThemer(InputFieldThemer):
 	''''''
-	
+
 	def theme_value(self, obj, format, view_mode, args):
 		value = super().theme_value(obj, format, view_mode, args)
+		# always convert to str, # number field
+		value = str(value)
 		value = html.escape(value, quote = True)
 		return value
 
@@ -76,7 +76,7 @@ class TextBoxThemer(InputFieldThemer):
 @IN.register('TextArea', type = 'Themer')
 class TextAreaThemer(InputFieldThemer):
 	''''''
-	
+
 #@IN.register('Password', type = 'Themer')
 #class PasswordThemer(TextBoxThemer):
 
@@ -88,12 +88,12 @@ class TextAreaThemer(InputFieldThemer):
 class SubmitThemer(InputFieldThemer):
 
 	pass
-	
+
 @IN.register('Button', type = 'Themer')
 class ButtonThemer(InputFieldThemer):
 
 	pass
-	
+
 @IN.register('FieldSet', type = 'Themer')
 class FieldSetThemer(TagThemer):
 
@@ -129,26 +129,6 @@ class HeadLinkThemer(ObjectThemer):
 		args['rel'] = obj.rel
 		args['link_type'] = obj.link_type
 
-#@IN.register('Options', type = 'Themer')
-#class OptionsThemer(In.themer.ObjectThemer):
-
-	#def theme(self, obj, format, view_mode, args):
-
-		#super().theme(obj, format, view_mode,  args)
-
-		#if not obj.multiple:
-			#val = obj.value or obj.def_value or ''
-			#for opt in obj.get_items(value = val).values():
-				#opt.selected = True
-		#else:
-			#vals = obj.value or obj.def_value or []
-			#for val in vals:
-				#for opt in obj.get_items(value = val).values():
-					#opt.selected = True
-
-	#def pre_process_theme_args(self, obj, args):
-		#args['view_mode'] = obj.view_mode
-
 
 
 @IN.register('RadioBoxes', type = 'Themer')
@@ -159,17 +139,34 @@ class RadioBoxesThemer(HTMLFieldThemer):
 
 		super().theme_prepare(obj, format, view_mode,  args)
 		name = obj.name
+		obj_value = obj.value
 
 		weight = 0
 		for value, label in obj.options.items():
-
-			obj.add('RadioBox', {
+			checked = value == obj_value
+			
+			if type(label) is dict:
+				c_label = label['label']
+				c_info = label.get('info', '')
+			else:
+				c_label = label
+				c_info = ''
+				
+			data = {
 				'name' : name,
 				'value' : value,
-				'label' : label,
+				'label' : c_label,
 				'weight' : weight,
-				'checked' : value == obj.value,
-			})
+				'checked' : checked,
+				'info' : c_info,
+			}
+
+			if obj.child_additional_data:
+				additional_data = copy.deepcopy(obj.child_additional_data)
+				data.update(additional_data)
+				
+
+			o = obj.add('RadioBox', data)
 			weight += 1
 
 
@@ -182,19 +179,33 @@ class CheckBoxesThemer(HTMLFieldThemer):
 
 		super().theme_prepare(obj, format, view_mode,  args)
 		name = obj.name
+		obj_value = obj.value
 
 		weight = 0
-		
+
 		for value, label in obj.options.items():
-			checked = obj.value and value in obj.value
-			#checked = True if value in obj.value else False
-			obj.add('CheckBox', {
+			checked = value == obj_value
+			
+			if type(label) is dict:
+				c_label = label['label']
+				c_info = label.get('info', '')
+			else:
+				c_label = label
+				c_info = ''
+				
+			data = {
 				'name' : name,
 				'value' : value,
-				'label' : label,
+				'label' : c_label,
 				'weight' : weight,
 				'checked' : checked,
-			})
+				'info' : c_info,
+			}
+
+			if obj.child_additional_data:
+				data.update(copy.deepcopy(obj.child_additional_data))
+
+			obj.add('CheckBox', data)
 			weight += 1
 
 @IN.register('HTMLSelect', type = 'Themer')
@@ -209,7 +220,7 @@ class HTMLSelectThemer(HTMLFieldThemer):
 		super().theme_process_variables(obj, format, view_mode,  args)
 		name = obj.name
 		select_options = obj.value
-		
+
 		if obj.multiple:
 			selected = lambda v: 'selected' if v in select_options else ''
 		else:
@@ -283,11 +294,11 @@ class DateSelectThemer(HTMLFieldThemer):
 class SiteFooterThemer(TagThemer):
 
 	pass
-	
+
 @IN.register('HTMLModalPopup', type = 'Themer')
 class HTMLModalPopupThemer(TextDivThemer):
 
 	def theme_process_variables(self, obj, format, view_mode, args):
-	
+
 		args['title'] = obj.title
 		super().theme_process_variables(obj, format, view_mode, args)

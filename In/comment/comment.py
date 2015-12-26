@@ -76,7 +76,7 @@ class CommentEntitier(In.entity.EntityEntitier):
 			if entitier.access('delete', entity):
 				delete = Object.new(type = 'Link', data = {
 					'id' : 'delete-link-' + id_suffix,
-					'css' : ['no-ajax ajax-modal i-button i-button-small'], # no-ajax needed here or it bind twice
+					'css' : ['no-ajax ajax-modal i-button i-button-small i-float-right'], # no-ajax needed here or it bind twice
 					'value' : s('delete'),
 					'href' : '/'.join(('/comment', str(entity.id), 'delete', 'confirm')),
 					'weight' : 1,
