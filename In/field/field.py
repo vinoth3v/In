@@ -895,11 +895,12 @@ class FieldModel(FieldModelBase):
 						rvalues.append(field_value.get(col, None))
 
 					qvalues.append(rvalues)
-
-			cursor = IN.db.insert({
-				'table' : table,
-				'columns' : column_keys,
-			}).execute(qvalues)
+			
+			if qvalues:
+				cursor = IN.db.insert({
+					'table' : table,
+					'columns' : column_keys,
+				}).execute(qvalues)
 
 
 			# commit the changes

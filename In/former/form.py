@@ -80,9 +80,12 @@ class FormThemer(ObjectThemer):
 		super().theme(obj, format, view_mode, args)
 		
 		obj.css.append(obj.__type__)
-		obj.css.append(obj.id)
+		
+		if obj.__type__ != obj.id:
+			obj.css.append(obj.id)
+			
 		obj.css.append('ajax i-form')
-		obj.css.append('i-panel i-panel-box')
+		#obj.css.append('i-panel i-panel-box')
 
 	def theme_process_variables(self, form, format, view_mode, args):
 		super().theme_process_variables(form, format, view_mode, args)

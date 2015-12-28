@@ -152,7 +152,7 @@ class FormerEngine:
 		if go_path:
 			return context.redirect(go_path, ajax_redirect = False)
 			
-		if form.redirect is not None:			
+		if form.redirect is not None:
 			return context.redirect(form.redirect, ajax_redirect = form.ajax_redirect)
 
 		if ajax and not form.context_response_changed: # process ajax response for the form submit

@@ -58,6 +58,7 @@ class ObjectLister(HTMLObject):
 		except ValueError:
 			self.current = 1
 		
+		#self.css.append('i-container')
 		
 	def list(self):
 		'''list objects'''

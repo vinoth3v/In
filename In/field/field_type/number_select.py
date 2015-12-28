@@ -37,7 +37,6 @@ class FieldNumberSelectFielder(FieldTextSelectFielder):
 		field_value_options_keys = data_field_config.get('field_value_option_keys', [])
 		field_value_option_values = data_field_config.get('field_value_option_values', {})
 
-
 		new_empty_fields = int(data_field_config.get('new_empty_fields', 1))
 
 		field_selection_type = data_field_config.get('field_selection_type', 'select')
@@ -71,15 +70,28 @@ class FieldNumberSelectFielder(FieldTextSelectFielder):
 			if lang not in field_languages:
 				continue
 			for idx, idx_val in lang_val.items():
-				field_values.append(str(idx_val['value'])) # values only match by str
-
+				idx_val_value = idx_val['value']
+				if type(idx_val_value) is str:
+					if idx_val_value.isnumeric():
+						idx_val_value = int(idx_val_value)
+					else:
+						continue
+				field_values.append(idx_val_value)
 
 		# get field options
 		field_options = OrderedDict()
 		for val in field_value_options_keys:
-			field_options[val] = field_value_option_values[val]
-
-
+			if val not in field_value_option_values:
+				continue
+				
+			val_label = field_value_option_values[val]
+			if type(val) is str:
+				if val.isnumeric():
+					val = int(val)
+				else:
+					continue # it is number select field
+			field_options[val] = val_label
+		
 		# TODO: get language
 		lang = ''
 		name = ''.join((field_name, '[', lang, '][0][value]'))

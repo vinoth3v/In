@@ -526,7 +526,9 @@ class EntityEntitier(EntityEntitierBase):
 		return result
 
 	def update(self, entity, commit = True):
-
+		
+		print('111111111111111111111111, ENTITY UPDATED : ', entity.__type__, entity.type, entity.id, entity.nabar_id)
+		
 		result = entity.Model.update(entity, commit)
 
 		# clear the cache
@@ -1151,9 +1153,9 @@ class EntityThemer(EntityBaseThemer):
 			'theme_view_mode' : view_mode,
 		}
 
-		link = Object.new(type = 'EntityContextLinks', data = data)
-		menu = Object.new(type = 'EntityContextMenu', data = data)
-		tab = Object.new(type = 'EntityContextTab', data = data)
+		link = Object.new('EntityContextLinks', data)
+		menu = Object.new('EntityContextMenu', data)
+		tab = Object.new('EntityContextTab', data)
 
 		theme = IN.themer.theme
 		args['entity_context_links'] = theme(link, format, 'lazy')
@@ -1180,10 +1182,10 @@ class EntityContextLinks(In.core.lazy.HTMLObjectLazy):
 		parent_entity_id = self.parent_entity_id
 
 		# always set new id
-		self.id = '_'.join((self.__type__, parent_entity_type, str(parent_entity_id)))
+		self.id = '_'.join((self.__type__, parent_entity_type, str(parent_entity_id), self.theme_view_mode))
 
 		# TODO:
-		self.css.append('')
+		#self.css.append('')
 
 class EntityContextMenu(EntityContextLinks):
 

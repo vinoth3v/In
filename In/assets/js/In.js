@@ -66,9 +66,10 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
     if (typeof scripts === 'string') {
       scripts = [scripts]
     }
-    for(var script in scripts) {
+    for(var idx in scripts) {
+	  var script = scripts[idx];
       if (typeof script === 'string') { // just run once
-        eval(script);
+		  try { eval(script); } catch(e1){}
         continue;
       }
       var tag = document.createElement('script'); tag.type = 'text/javascript';
@@ -668,6 +669,9 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
 
         title : function (title) {
           document.title = title;
+        },
+        script: function (script) {
+          IN.runScript(script);
         }
     };
 
@@ -808,19 +812,31 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
             }
 
 
-            $('.ajax-modal').once('ajax-modal', function(){
+            $('.ajax-modal').once('ajax-modal', function() {
                 var $el = $(this);
-                $el.click(function(event){
+                $el.click(function(event) {
                     event.preventDefault(); event.stopPropagation();
-
-                    var id = 'i-ajax-modal';
-                    $('#' + id).remove(); // delete old modal, content not updating
-                    $('<div id="'+id+'" class="i-modal"><div class="i-modal-dialog"><a class="i-modal-close i-close"></a><div class="modal-content i-modal-spinner"></div></div></div>').appendTo('body');
+					
+					var id = $el.data('modal_id'); if (!id) { id = 'i-ajax-modal'; }
+					var modal_class = $el.data('modal_class'); if (!modal_class) { modal_class = ''; }
+					var modal_options = $el.data('modal_options'); if (!modal_options) { modal_options = {}; }
+					var ajax_args = $el.data('ajax_args'); if (!ajax_args) { ajax_args = {}; }
+					
+					ajax_args['modal_id'] = id;
+                    $('#' + id).remove(); // delete old, content not updating
+                    $('<div id="'+id+'" class="i-modal"><div class="i-modal-dialog ' + modal_class + '"><a class="i-modal-close i-close"></a><div class="modal-content i-modal-spinner"></div></div></div>').appendTo('body');
                     var trigger = 'i-ajax-modal-trigger';
                     var $a = $('<a id="'+trigger+'"></a>');
                     var url = $el.attr('href'); if (!url) { url = $el.data('href'); } if (!url) { url = $el.data('url'); }
-                    IN.ajax[trigger] = new IN.ajax(trigger, $a[0], {element_id : trigger, event : 'click', url : url, 'type' : 'POST', modal : true});
-                    var modal = UIkit.modal('#' + id);
+                    IN.ajax[trigger] = new IN.ajax(trigger, $a[0], {
+						element_id : trigger, 
+						event : 'click', 
+						url : url, 
+						'type' : 'POST', 
+						modal : true,
+						ajax_args : ajax_args
+					});
+                    var modal = UIkit.modal('#' + id, modal_options);
                     modal.show();
                     $a.click(); // ajax load trigger
                 });
@@ -875,7 +891,14 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
                 $el.find('a').click();
               });
             });
-
+            
+            require(['uikit!grid'], function(uigrid) {
+                $('.i-grid-dynamic').once('i-grid-dynamic', function() {
+                    var $el = $(this);
+                    var grid = UIkit.grid($el, { gutter: $el.data('grid_gutter')});
+                });
+            });
+            
         },
         unbind : function() {}
     });

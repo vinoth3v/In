@@ -34,7 +34,8 @@ class ContentDeleteFormFormer(In.entity.EntityDeleteFormFormer):
 		
 		entity = form.entity
 		
-		if 'submit' in post:
+		if 'element_id' in post and post['element_id'] == 'submit':
+			
 			form.result_commands = []
 			try:
 				entity.Entitier.delete(entity)

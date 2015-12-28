@@ -39,7 +39,7 @@ class VakaiDeleteFormFormer(In.entity.EntityDeleteFormFormer):
 			'args' : [],
 		}]
 		
-		if 'submit' in post:
+		if 'element_id' in post and post['element_id'] == 'submit':
 			
 			entity.Entitier.delete(entity)
 			

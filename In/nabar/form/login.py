@@ -46,7 +46,7 @@ class FormLogin(Form):
 
 
 
-		if 'resend' in post:
+		if 'element_id' in post and post['element_id'] == 'resend':
 		
 			set = self.add('FieldSet', {
 				'id' : 'resendset',

@@ -423,14 +423,14 @@ class CheckBoxes(HTMLObject):
 
 		# value in list not found because of str to int types
 		# convert all to str as options dict keys are str
-		if self.value:
-			if self.multiple:
-				if type(self.value) is list or type(self.value) is set or type(self.value) is enumerate:
-					newvals = [str(v) for v in self.value]
-				else:
-					self.value = [str(self.value)]
-			else:
-				self.value = str(self.value)
+		#if self.value:
+			#if self.multiple:
+				#if type(self.value) is list or type(self.value) is set or type(self.value) is enumerate:
+					#newvals = [v for v in self.value]
+				#else:
+					#self.value = [self.value]
+			#else:
+				#self.value = self.value
 
 class DateSelect(HTMLField):
 	__tag__ = 'div'

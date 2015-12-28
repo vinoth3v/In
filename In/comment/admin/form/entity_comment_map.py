@@ -262,7 +262,7 @@ class FormEntityCommentMapAdminFormer(FormFormer):
 		
 		try:
 
-			if 'submit' not in post:
+			if 'element_id' not in post or post['element_id'] != 'submit':
 				return
 			
 			if 'ajax_args' in post:

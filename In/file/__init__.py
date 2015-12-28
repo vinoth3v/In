@@ -1,4 +1,5 @@
-import os, random
+import os, random, json, shutil, magic
+
 from In.core.action import ActionObject
 from .entity_file import *
 from .field_file import *
@@ -153,3 +154,53 @@ def get_random_file(ext):
 		file_path = os.path.join(IN.APP.config.tmp_file_dir, file_name + ext)
 		if not os.path.exists(file_path):
 			return file_path
+
+
+def create_file_entity(path, default_file_bundle):
+	'''path is temporary uploaded path'''
+
+	# invalid?
+	if not os.path.exists(path):
+		IN.logger.debug(path + ' not exists')
+		return
+	
+	size = os.path.getsize(path)
+	
+	# returns bytes
+	mime = magic.from_file(path, mime=True).decode("utf-8")
+	mime1, mime2 = mime.split('/', 1)
+	
+	public_file_dir = IN.APP.config.public_file_dir
+	
+	save_to = 'images/' + str(IN.context.nabar.id)
+	
+	save_to = os.path.join(public_file_dir, save_to)						
+	
+	# create folder
+	os.makedirs(save_to, exist_ok = True)
+	file_name = os.path.split(path)[1]
+	save_to = os.path.join(save_to, file_name)
+	
+	shutil.move(path, save_to)
+	
+	path = save_to
+	
+	# TODO: strip the path prefix
+	
+	path = path.replace(public_file_dir + '/', '', 1)
+	
+	# create new File entity
+	file = Entity.new('File', {
+		'type' : default_file_bundle,
+		'nabar_id' : IN.context.nabar.id,	# current user
+		'status' : 1,			# active
+		'path' : path,
+		'size' : size,
+		'mime1' : mime1,
+		'mime2' : mime2,
+		'remote': 0,
+		'data'	: json.dumps({}, skipkeys = True, ensure_ascii = False),
+	})
+	file_id = IN.entitier.save(file)
+	
+	return file_id

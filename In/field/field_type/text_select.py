@@ -67,12 +67,13 @@ class FieldTextSelectFielder(FieldTextFielder):
 				continue
 			for idx, idx_val in lang_val.items():
 				field_values.append(str(idx_val['value'])) # values only match by str
-
-
+		
+		
+		
 		# get field options
 		field_options = OrderedDict()
 		for vals in field_value_options:
-			field_options[vals[0]] = vals[1]
+			field_options[str(vals[0])] = vals[1]
 
 		# TODO: get language
 		lang = ''

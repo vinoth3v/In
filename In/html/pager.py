@@ -12,6 +12,7 @@ class Pager(HTMLObject):
 	total_page = 0
 	
 	link_ajax_args = None
+	link_attributes = None
 	
 	def __init__(self, data = None, items = None, **args):
 		
@@ -96,7 +97,10 @@ class PagerPrevNextThemer(PagerThemer):
 			if obj.link_ajax_args:
 				ajax_args = json.dumps(obj.link_ajax_args, skipkeys = True, ensure_ascii = False)
 				v.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				v.attributes.update(obj.link_attributes)
+			
 		next_index = obj.current_page + 1
 
 		url = ''.join(('/', obj.url, '?page=', str(next_index)))
@@ -110,6 +114,9 @@ class PagerPrevNextThemer(PagerThemer):
 			ajax_args = json.dumps(obj.link_ajax_args, skipkeys = True, ensure_ascii = False)
 			v.attributes['data-ajax_args'] = ajax_args
 		
+		if obj.link_attributes:
+			v.attributes.update(obj.link_attributes)
+				
 		obj.value = ''
 		
 		super().theme_items(obj, format, view_mode, args)
@@ -163,7 +170,9 @@ class PagerNumberListThemer(PagerThemer):
 			})
 			if obj.link_ajax_args:
 				l.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
 		
 		# add next
 		next = current_page + 1
@@ -177,16 +186,27 @@ class PagerNumberListThemer(PagerThemer):
 			})
 			if obj.link_ajax_args:
 				l.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
+				
 		# add first
 		if prev > 1:
-			obj.add('Li', {
+			o = obj.add('Li', {
 				'weight': 1,
-			}).add('Link', {
+			})
+			l = o.add('Link', {
 				'href' : url,
 				'value' : '1',
 			})
-		
+			if obj.link_ajax_args:
+				l.attributes['data-ajax_args'] = ajax_args
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
+				
+			
+			
 		# add first	next
 		if prev > 2:
 			o = obj.add('Li', {
@@ -198,7 +218,10 @@ class PagerNumberListThemer(PagerThemer):
 			})
 			if obj.link_ajax_args:
 				l.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
+				
 		
 		# add eclipse
 		if 3 < prev:
@@ -219,7 +242,9 @@ class PagerNumberListThemer(PagerThemer):
 			})
 			if obj.link_ajax_args:
 				l.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
 		
 		# add last prev
 		lastprev = total_pages - 1
@@ -233,7 +258,9 @@ class PagerNumberListThemer(PagerThemer):
 			})
 			if obj.link_ajax_args:
 				l.attributes['data-ajax_args'] = ajax_args
-		
+			
+			if obj.link_attributes:
+				l.attributes.update(obj.link_attributes)
 		
 		# add eclipse
 		if lastprev -1 > next:

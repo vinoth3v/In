@@ -180,11 +180,14 @@ class CheckBoxesThemer(HTMLFieldThemer):
 		super().theme_prepare(obj, format, view_mode,  args)
 		name = obj.name
 		obj_value = obj.value
-
+		
 		weight = 0
 
 		for value, label in obj.options.items():
-			checked = value == obj_value
+			if obj.multiple:
+				checked = value in obj_value
+			else:
+				checked = value == obj_value
 			
 			if type(label) is dict:
 				c_label = label['label']

@@ -18,76 +18,6 @@ class FieldFileFielder(FieldEntityReferenceFielder):
 
 	default_file_bundle = 'file'
 	
-	#def form_field(self, field_config, field_value = None, language = ''):
-		#'''returns form field based on field type, data, language'''
-
-		#field_name = field_config['field_name']
-		#field_data = field_config['data']
-		#if field_data is None:
-			#field_data = {}
-		#if field_value is None:
-			#field_value = {}
-		#print(field_value)
-		#title = field_data.get('title', field_name)
-		#max_allowed = int(field_data.get('max_allowed', 1)) # 0, unlimited
-		#new_empty_fields = int(field_data.get('new_empty_fields', 1))
-
-		## '': field is available to all language
-		#field_languages = field_data.get('languages', [''])
-		#if field_languages is None:
-			#field_languages = [''] # all language
-
-		## return if field is not for this language
-		#if language not in field_languages:
-			#return
-		
-		## wrapper
-		#obj = Object.new('HTMLField', {
-			#'id' : field_name,
-			#'title' : title,
-			#'weight': field_config['weight'],
-			#'css' : ['field form-field']
-		#})
-
-		#for lang, idx_val in field_value.items():
-			#if lang not in field_languages:
-				#continue
-				
-			#for idx, value in idx_val.items():
-				## TODO
-				#name = ''.join((field_name, '[', lang, '][', str(idx), '][value]'))
-				#id = '_'.join((field_name, lang, str(idx), 'value'))
-				#obj.add(type = self.field_class.__input_field_type__, data = {
-					#'id' : id,
-					#'name' : name,
-					#'value' : value['value'],
-					#'placeholder' : title,
-					##'validation_rule' : ['Length', 6, '>', 0, 'The loginname length should be greater than 6.'],
-					#'css' : ['i-width-1-1 i-form-large'],
-					#'weight' : int(idx),
-				#})
-
-		#added = len(obj)
-		## add remaining new/empty fields
-		#if max_allowed != 0:
-			#new_empty_fields = max_allowed - added
-
-		#if new_empty_fields > 0:
-			## add new empty
-			#for added_idx in range(added, new_empty_fields + added):
-				#name = ''.join((field_name, '[', language, '][', str(added_idx), '][value]'))
-				#id = '_'.join((field_name, language, str(added_idx), 'value'))
-				#obj.add(type = self.field_class.__input_field_type__, data = {
-					#'id' : id,
-					#'name' : name,
-					#'value' : '',
-					#'placeholder' : title,
-					##'validation_rule' : ['Length', 6, '>', 0, 'The loginname length should be greater than 6.'],
-					#'css' : ['i-width-1-1 i-form-large'],
-					#'weight' : added_idx,
-				#})
-		
-		#return obj
 	
 	def __file_create_from_post__(self, field_value):
 		if type(field_value) is not dict:
@@ -97,51 +27,7 @@ class FieldFileFielder(FieldEntityReferenceFielder):
 			
 			path = field_value['path']
 			
-			# invalid?
-			if not os.path.exists(path):
-				IN.logger.debug(path + ' not exists')
-				return
-			
-			size = os.path.getsize(path)
-			
-			# returns bytes
-			mime = magic.from_file(path, mime=True).decode("utf-8")
-			mime1, mime2 = mime.split('/', 1)
-			
-			public_file_dir = IN.APP.config.public_file_dir
-			
-			save_to = 'images/' + str(IN.context.nabar.id)
-			
-			save_to = os.path.join(public_file_dir, save_to)						
-			
-			# create folder
-			os.makedirs(save_to, exist_ok = True)
-			file_name = os.path.split(path)[1]
-			save_to = os.path.join(save_to, file_name)
-			
-			shutil.move(path, save_to)
-			
-			path = save_to
-			
-			# TODO: strip the path prefix
-			
-			path = path.replace(public_file_dir + '/', '', 1)
-			
-			# create new File entity
-			file = Entity.new('File', {
-				'type' : self.default_file_bundle,
-				'nabar_id' : IN.context.nabar.id,	# current user
-				'status' : 1,			# active
-				'path' : path,
-				'size' : size,
-				'mime1' : mime1,
-				'mime2' : mime2,
-				'remote': 0,
-				'data'	: json.dumps({}, skipkeys = True, ensure_ascii = False),
-			})
-			file_id = IN.entitier.save(file)
-			
-			return file_id
+			return In.file.create_file_entity(path, self.default_file_bundle)
 		
 	def __field_prepare_insert_update__(self, field):
 		'''prepare the field submit values to db insert/update'''
@@ -152,7 +38,11 @@ class FieldFileFielder(FieldEntityReferenceFielder):
 		
 		if value:
 			for lang, lang_items in value.items():
-				for idx, idx_items in lang_items.items():
+				new_lang_items = {}
+				new_idx = 0
+				for idx in sorted(lang_items.keys(), key = lambda o:o):
+					idx_items = lang_items[idx]
+					
 					field_value = idx_items['value']
 					# new file uploaded
 					
@@ -161,15 +51,20 @@ class FieldFileFielder(FieldEntityReferenceFielder):
 						file_id = self.__file_create_from_post__(field_value)
 						
 						if file_id:
-							field.value[lang][idx]['value'] = file_id
+							idx_items['value'] = file_id
 						else:
 							
 							raise Exception('Unable to save the file ' + field_value['path'])
 							IN.logger.debug('Unable to save the file ' + field_value['path'])
 							#del field.value[lang][idx]
-							field.value[lang][idx]['value'] = 0
+							idx_items['value'] = 0
 							continue
-		
+					
+					if idx_items['value']:
+						new_lang_items[new_idx] = idx_items
+						new_idx += 1
+				
+				value[lang] = new_lang_items
 	
 	def prepare_insert(self, field):
 		'''prepare the field submit values to db insert'''

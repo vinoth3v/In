@@ -61,6 +61,7 @@ class FieldVakaiFielder(FieldEntityReferenceFielder):
 			'css' : ['field form-field']
 		})
 
+				
 		# get field values
 		field_values = []
 
@@ -72,7 +73,7 @@ class FieldVakaiFielder(FieldEntityReferenceFielder):
 			for idx, value in idx_val.items():
 
 				self.__get_vakais_from_post__(value, field_values, vakai_bundle)
-
+		
 		# get field options
 		field_options = OrderedDict()
 		if field_selection_type != 'autocomplete':
@@ -196,7 +197,7 @@ class FieldVakaiFielder(FieldEntityReferenceFielder):
 				idx = 0
 				for v in new_values:
 					field_value[lang][idx] = {
-						'value' : v
+						'value' : v # values only match by str
 					}
 
 					idx = idx + 1

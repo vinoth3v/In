@@ -28,8 +28,9 @@ def profile_action_handler_page_profile_edit(context, action, entity_id, profile
 	})
 	
 	if 'Profile' in entitier.entity_bundle:
-		for bundle, bundle_conf in entitier.entity_bundle['Profile'].items():
-			
+		profile_config = entitier.entity_bundle['Profile']
+		for bundle in sorted(profile_config.keys(), key = lambda o:o):
+			bundle_conf = profile_config[bundle]
 			tab.add('Li', {
 				'css' : ['i-active' if profile_bundle == bundle else '']
 			}).add('Link', {

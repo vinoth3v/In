@@ -110,8 +110,8 @@ class FormSearchFormer(FormFormer):
 		
 @IN.register('FormSearch', type = 'Themer')
 class FormSearchThemer(FormThemer):
+	''''''
+	#def theme(self, obj, format, view_mode, args):
+		#super().theme(obj, format, view_mode, args)
 
-	def theme(self, obj, format, view_mode, args):
-		super().theme(obj, format, view_mode, args)
-
-		obj.css.remove('i-panel i-panel-box')
+		#obj.css.remove('i-panel i-panel-box')

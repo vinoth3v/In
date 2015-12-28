@@ -40,7 +40,7 @@ class StatusDeleteFormFormer(In.entity.EntityDeleteFormFormer):
 			'args' : [],
 		}]
 		
-		if 'submit' in post:
+		if 'element_id' in post and post['element_id'] == 'submit':
 			try:
 				entity.Entitier.delete(entity)
 			

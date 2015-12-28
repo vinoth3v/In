@@ -267,8 +267,8 @@ class FlagButtonFormFormer(FormFormer):
 
 @IN.register('FlagButtonForm', type = 'Themer')
 class FlagButtonFormThemer(FormThemer):
+	''''''
+	#def theme(self, obj, format, view_mode, args):
+		#super().theme(obj, format, view_mode, args)
 
-	def theme(self, obj, format, view_mode, args):
-		super().theme(obj, format, view_mode, args)
-
-		obj.css.remove('i-panel i-panel-box')
+		#obj.css.remove('i-panel i-panel-box')
