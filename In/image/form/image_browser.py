@@ -13,8 +13,6 @@ class FormImageBrowser(Form):
 
 		super().__init__(data, items, **args)
 		
-		
-		
 		tab = self.add('Ul', {
 			'id' : 'browse_tab',
 			'attributes' : {
@@ -124,6 +122,7 @@ class FormImageBrowser(Form):
 				'css' : ['i-grid i-grid-medium i-margin i-margin-top'], # i-grid-width-small-1-2 i-grid-width-medium-1-5
 			},
 			'container' : browse_content,
+			'empty_text' : s('No images found! Please upload a new one.'),
 		})
 		
 		# handle the list
@@ -166,20 +165,26 @@ def handler_prepare_objects(self):
 				})
 				thumb = wrapper.add('TextDiv', {
 					'id' : cid,
-					'css' : ['i-thumbnail'],
+					'css' : ['i-thumbnail i-position-relative'],
 					'attributes' : {
-						'onclick' : 'var t = jQuery(this); t.toggleClass("border-blue-3"); var c = t.find(":checkbox"); c.prop("checked", !c.prop("checked"));'
+						'onclick' : 'var t = jQuery(this); t.toggleClass("border-blue-3"); var c = t.find(":checkbox"); c.prop("checked", !c.prop("checked")); t.find(".check-icon").toggleClass("i-hidden");;'
 					},
 				})
-				
+				thumb.add('TextDiv', {
+					'value' : '<i class="i-icon-check-circle i-icon-small bg-white"></i>',
+					'weight' : 0,
+					'css' : ['i-hidden check-icon i-position-absolute']
+				}) 
 				thumb.add('CheckBox', {
 					'id' : cid + '-check',
 					'name' : 'selected_files',
 					'css' : ['i-hidden'],
 					'value' : id,
+					'weight' : 1,
 				})
-				
+				entity.weight = 2
 				thumb.add(entity)
+				
 				
 				weight += 1
 
@@ -223,33 +228,85 @@ class FormImageBrowserFormer(FormFormer):
 		try:
 			
 			ajax_args = form.args['ajax_args']
-			field_id = ajax_args['field_id']
-			field_name = ajax_args['field_name']
-			form_id = ajax_args['form_id']
+			
+			pprint(ajax_args)
 			
 			selected_files =  post.get('selected_files', [])
 			
 			if selected_files:
-				if type(selected_files) is list: # multiple
-					options = ''.join(([str(id).join(('<option selected value="', '"></option>')) for id in selected_files]))
-				else:
-					options = str(selected_files).join(('<option selected value="', '"></option>'))
 				
-				form.result_commands = [{
-					'method' : 'closeAjaxModal',
-					'args' : [],
-				}]
+				# image field
+				if 'field_id' in ajax_args:
+					
+					field_id = ajax_args['field_id']
+					field_name = ajax_args['field_name']
+					form_id = ajax_args['form_id']
+					
+					if type(selected_files) is list: # multiple
+						options = ''.join(([str(id).join(('<option selected value="', '"></option>')) for id in selected_files]))
+					else:
+						options = str(selected_files).join(('<option selected value="', '"></option>'))
+					
+					form.result_commands = [{
+						'method' : 'closeAjaxModal',
+						'args' : [],
+					}]
+					
+					script = '''
+					var c = jQuery('#''' + field_id + '''');
+					c.html(' ''' + options + ''' ');
+					c.trigger('change');
+					'''
+					
+					form.result_commands.append({
+						'method' : 'script',
+						'args' : [script]
+					})
+					
+					return
 				
-				script = '''
-				var c = jQuery('#''' + field_id + '''');
-				c.html(' ''' + options + ''' ');
-				c.trigger('change');
-				'''
-				
-				form.result_commands.append({
-					'method' : 'script',
-					'args' : [script]
-				})
+				# ckeditor
+				elif 'editor_id' in ajax_args:
+					
+					editor_id = ajax_args['editor_id']
+					entitier = IN.entitier
+					
+					if type(selected_files) is not list:
+						selected_files = [selected_files]
+					
+					selected_files = [int(id) for id in selected_files]
+					
+					entities = entitier.load_multiple('File', selected_files)
+					weight = 1
+					
+					theme = IN.themer.theme
+					
+					themed = []
+					
+					for id in selected_files:
+						if id in entities:
+							entity = entities[id]
+							if entity:
+								themed.append(theme(entity))
+					
+					themed = ''.join(themed)
+					
+					themed = themed.replace("\r", '').replace("\n", '<br><br>') # js multiline
+					
+					form.result_commands = [{
+						'method' : 'closeAjaxModal',
+						'args' : [],
+					}]
+					
+					script = 'CKEDITOR.instances["' + editor_id + '"].insertHtml(\'' + themed + '\');'
+					
+					form.result_commands.append({
+						'method' : 'script',
+						'args' : [script]
+					})
+					
+					return
+					
 			
 		except Exception as e:
 			
@@ -257,4 +314,5 @@ class FormImageBrowserFormer(FormFormer):
 			form.error_message = s('Unknown error occurred! Please try again!')
 			form.has_errors = True
 			return
-
+		
+		form.__list_images__()

@@ -37,9 +37,9 @@ class FieldConfigForm(FieldConfigFormBase):
 		field_config = config_data.get('field_config', {})
 		
 		self.config = config
-		
+		admin_path = IN.APP.config.admin_path
 		if 'display_config' not in config_data or not config_data['display_config']:
-			url = ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!default'))
+			url = ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!default'))
 			set.add('TextDiv', {
 				'value' : s('After saving this field configuration you should also set the {field display}.', {
 					'field display' : ''.join(('<a href="', url, '">', s('field display'), '</a>'))
@@ -116,7 +116,7 @@ class FieldConfigForm(FieldConfigFormBase):
 		})
 		set.add('Link', {
 			'value' : s('Cancel'),
-			'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field')),
+			'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field')),
 			'css' : ['i-button']
 		})
 		

@@ -81,7 +81,9 @@ class VakaiEditFormFormer(In.entity.EntityEditFormFormer):
 		else:
 			# TODO: dymanic url based on entity view url
 			#context.redirect('/'.join((entity.parent_entity_type.lower(), str(entity.parent_entity_id))))
-			form.redirect = ''.join(('admin/structure/entity/!', entity.__type, '/bundle/!', entity.type, '/manage/vakai'))
+			
+			admin_path = IN.APP.config.admin_path
+			form.redirect = ''.join((admin_path, '/structure/entity/!', entity.__type, '/bundle/!', entity.type, '/manage/vakai'))
 			
 				
 		#except Exception:

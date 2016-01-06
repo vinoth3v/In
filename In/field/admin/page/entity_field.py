@@ -14,6 +14,8 @@ def field_admin_action_field_ui_form(context, action, entity_type, entity_bundle
 	
 	entity_field_config = fielder.entity_field_config
 	
+	admin_path = IN.APP.config.admin_path
+	
 	subs = ''
 	if entity_type in entity_field_config and entity_bundle in entity_field_config[entity_type]:
 		
@@ -25,16 +27,16 @@ def field_admin_action_field_ui_form(context, action, entity_type, entity_bundle
 		
 		for field_name, field_config in field_config.items():
 			subs.append(''.join((
-			'<tr><td><a data-ajax_panel="content" href="/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit">', field_name, '</a>', '</td>',
+			'<tr><td><a data-ajax_panel="content" href="/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit">', field_name, '</a>', '</td>',
 			'<td>', field_config['field_type'], '</td>',
-			'''<td><div class="i-button-group">
-	<a href="/admin/structure/entity/!''', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit" class="i-button">', s('Edit'), '''</a>
+			'<td><div class="i-button-group">',
+			'<a href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit" class="i-button">', s('Edit'), '''</a>
 	<div data-i-dropdown="{mode:'click'}">
 		<a href="#" class="i-button"><i class="i-icon-caret-down"></i></a>
 		<div class="i-dropdown i-dropdown-small">
 			<ul class="i-nav i-nav-dropdown">
-				<li></li>
-				<li><a href="/admin/structure/entity/!''', entity_type, '/add/!', entity_bundle, '">', s('Add new {entity_bundle}', {'entity_bundle' : entity_bundle}),'''</a></li>
+				<li></li>''',
+				'<li><a href="/', admin_path, '/structure/entity/!''', entity_type, '/add/!', entity_bundle, '">', s('Add new {entity_bundle}', {'entity_bundle' : entity_bundle}),'''</a></li>
 			</ul>
 		</div>
 	</div>
@@ -62,5 +64,5 @@ def field_admin_action_field_ui_form(context, action, entity_type, entity_bundle
 	set.add('Link', {
 		'css' : ['i-button i-button'],
 		'value' : s('Add new field'),
-		'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/add')),
+		'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/add')),
 	})

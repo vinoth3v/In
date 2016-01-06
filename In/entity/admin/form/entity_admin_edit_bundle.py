@@ -87,9 +87,11 @@ class FormEntityAdminEditBundle(Form):
 			'css' : ['i-button i-button-primary']
 		})
 		
+		admin_path = IN.APP.config.admin_path
+		
 		set.add('Link', {
 			'value' : s('Cancel'),
-			'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle')),
+			'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle')),
 			'css' : ['i-button']
 		})
 		
@@ -137,7 +139,9 @@ class FormEntityAdminEditBundle(FormFormer):
 
 			connection.commit()
 			
-			form.redirect = entity_type.join(('admin/structure/entity/!', '/bundle'))
+			admin_path = IN.APP.config.admin_path
+			
+			form.redirect = ''.join((admin_path, '/structure/entity/!', entity_type, '/bundle'))
 			
 		except Exception as e:
 			connection.rollback()

@@ -153,7 +153,8 @@ class WSContext(Context, WebSocketServerProtocol):
 	def onClose(self, wasClean, code, reason):
 		#print('client closed', code, reason)
 		
-		self.factory = None
+		# inbuilt by autobahn
+		#self.factory = None
 		
 		nabar_id = self.nabar.id
 		if nabar_id in IN.APP.contexts:

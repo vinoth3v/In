@@ -21,7 +21,7 @@ def action_handler_vakai_entity_list(context, action, entity_type, field, vakai_
 		context.page_title = entity_title
 	
 	#TODO: it overrides weight property of vakai
-	vakai_entity.weight = -1
+	vakai_entity.weight = -2
 	
 	context.response.output.add(vakai_entity)
 	

@@ -95,4 +95,5 @@ class StatusAddFormThemer(FormThemer):
 		
 		args['nabar_name'] = nabar.name
 		args['nabar_id'] = nabar.id
+		
 		args['nabar_picture'] = IN.nabar.nabar_profile_picture_themed(nabar)

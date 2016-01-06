@@ -3,47 +3,49 @@
 @IN.hook
 def actions():
 	actns = {}
-
-	actns['admin/structure/entity'] = {
+	
+	admin_path = IN.APP.config.admin_path
+	
+	actns[admin_path + '/structure/entity'] = {
 		'title' : 'Entity',
 		'handler' : entity_admin_action_entity_list,
 	}
 	
-	actns['admin/structure/entity/{entity_type}'] = {
+	actns[admin_path + '/structure/entity/{entity_type}'] = {
 		'title' : 'Entity',
 		'handler' : entity_admin_action_config_ui_form,
 	}
-	actns['admin/structure/entity/{entity_type}/bundle'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/bundle'] = {
 		'title' : 'Entity',
 		'handler' : entity_admin_action_config_bundle_ui_form,
 	}
 
-	actns['admin/structure/entity/{entity_type}/add/{entity_bundle}'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/add/{entity_bundle}'] = {
 		'title' : 'Entity',
 		'handler' : entity_admin_action_add_entity,
 	}
 	
-	actns['admin/structure/entity/{entity_type}/bundle/{entity_bundle}/edit'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/bundle/{entity_bundle}/edit'] = {
 		'title' : 'Edit Entity bundle',
 		'handler' : entity_admin_action_entity_bundle_edit,
 	}
 	
 	
-	actns['admin/structure/entity/{entity_type}/{entity_id}'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/{entity_id}'] = {
 		'title' : 'Entity view',
 		'handler' : entity_admin_action_view_entity,
 	}
 
-	actns['admin/structure/entity/{entity_type}/{entity_id}/edit'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/{entity_id}/edit'] = {
 		'title' : 'Entity edit',
 		'handler' : entity_admin_action_edit_entity,
 	}
 	
-	actns['admin/structure/entity/{entity_type}/list'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/list'] = {
 		'title' : 'Entity list',
 		'handler' : entity_admin_action_entity_list_entity_instance,
 	}
-	actns['admin/structure/entity/{entity_type}/bundle/{entity_bundle}/list'] = {
+	actns[admin_path + '/structure/entity/{entity_type}/bundle/{entity_bundle}/list'] = {
 		'title' : 'Entity list by bundle',
 		'handler' : entity_admin_action_entity_bundle_list,
 	}
@@ -84,14 +86,16 @@ def entity_admin_action_entity_list(context, action, **args):
 	
 	si = sorted(types.keys(), key = lambda o: o)
 	
+	admin_path = IN.APP.config.admin_path
+	
 	for entity_type in si:
 		
 		values.append(''.join((
-			'<tr><td><a data-ajax_panel="content" href="/admin/structure/entity/!', entity_type, '/bundle">', entity_type, '</a>', '</td>',
-			'''<td><div class="i-button-group">
-    <a href="/admin/structure/entity/!''', entity_type, '" class="i-button">', s('Edit'), '''</a>
-    <a href="/admin/structure/entity/!''', entity_type, '/bundle" class="i-button">', s('Bundles'), '''</a>
-    <div data-i-dropdown="{mode:'click'}">
+			'<tr><td><a data-ajax_panel="content" href="/', admin_path, '/structure/entity/!', entity_type, '/bundle">', entity_type, '</a>', '</td>',
+			'<td><div class="i-button-group">',
+    '<a href="/', admin_path, '/structure/entity/!''', entity_type, '" class="i-button">', s('Edit'), '</a>',
+    '<a href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle" class="i-button">', s('Bundles'), '</a>',
+    '''<div data-i-dropdown="{mode:'click'}">
         <a href="#" class="i-button"><i class="i-icon-caret-down"></i></a>
         <div class="i-dropdown i-dropdown-small">
             <ul class="i-nav i-nav-dropdown">
@@ -139,6 +143,8 @@ def entity_admin_action_config_bundle_ui_form(context, action, entity_type, **ar
 	types = entitier.types
 	bundles = entitier.entity_bundle
 	
+	admin_path = IN.APP.config.admin_path
+	
 	subs = ''
 	if entity_type in bundles:
 		subs = [''.join(('<thead><tr><td>', s('Bundle name'), '</td><td>', s('Actions'), '</td></tr></thead>'))]
@@ -147,17 +153,17 @@ def entity_admin_action_config_bundle_ui_form(context, action, entity_type, **ar
 		
 		for bundle in bundles[entity_type]:
 			subs.append(''.join((
-			'<tr><td><a data-ajax_panel="content" href="/admin/structure/entity/!', entity_type, '/bundle/!', bundle, '/edit">', bundle, '</a>', '</td>',
-			'''<td><div class="i-button-group">
-	<a href="/admin/structure/entity/!''', entity_type, '/bundle/!', bundle, '/edit" class="i-button">', s('Edit'), '''</a>
-	<a href="/admin/structure/entity/!''', entity_type, '/bundle/!', bundle, '/field" class="i-button">', s('Fields'), '''</a>
-	<a href="/admin/structure/entity/!''', entity_type, '/bundle/!', bundle, '/display/!default" class="i-button">', s('Display'), '''</a>
+			'<tr><td><a data-ajax_panel="content" href="/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', bundle, '/edit">', bundle, '</a>', '</td>',
+			'<td><div class="i-button-group">',
+	'<a href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle/!', bundle, '/edit" class="i-button">', s('Edit'), '</a>',
+	'<a href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle/!', bundle, '/field" class="i-button">', s('Fields'), '</a>',
+	'<a href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle/!', bundle, '/display/!default" class="i-button">', s('Display'), '''</a>
 	<div data-i-dropdown="{mode:'click'}">
 		<a href="#" class="i-button"><i class="i-icon-caret-down"></i></a>
 		<div class="i-dropdown i-dropdown-small">
 			<ul class="i-nav i-nav-dropdown">
-				<li></li>
-				<li><a href="/admin/structure/entity/!''', entity_type, '/add/!', bundle, '">', s('Add new {entity_bundle}', {'entity_bundle' : bundle}),'''</a></li>
+				<li></li>''',
+				'<li><a href="/', admin_path, '/structure/entity/!''', entity_type, '/add/!', bundle, '">', s('Add new {entity_bundle}', {'entity_bundle' : bundle}), '''</a></li>
 			</ul>
 		</div>
 	</div>

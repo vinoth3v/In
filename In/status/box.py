@@ -39,6 +39,5 @@ class BoxStatusAddForm(In.boxer.BoxLazy):
 
 @IN.register('BoxStatusAddForm', type = 'Themer')
 class BoxStatusAddFormThemer(In.boxer.BoxLazyThemer):
-
-	pass
+	''''''
 	

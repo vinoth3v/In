@@ -5,22 +5,26 @@ import datetime
 def ws_action_me(context, message):
 	
 	try:
+		
+		nabar = context.nabar
+		nabar_id = nabar.id
+		
+		if not nabar_id:
+			return
+		
 		context.send({
 			'ws_command' : 'me',
 			'nabar' : {
-				'id' : context.nabar.id,
-				'name' : context.nabar.name
+				'id' : nabar_id,
+				'name' : nabar.name
 			}
 		})
 	except Exception as e:
 		IN.logger.debug()
 	
-	
-	
 	try:
 		
 		now = datetime.datetime.now()
-		nabar_id = context.nabar.id
 		
 		# update
 		cursor = IN.db.update({

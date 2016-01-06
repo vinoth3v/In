@@ -18,8 +18,10 @@ class BoxAdminNabarRoleAccessGroupThemer(BoxThemer):
 
 		access_keys = IN.nabar.access_keys
 		
+		admin_path = IN.APP.config.admin_path
+		
 		for group in access_keys:
-			values.append(''.join(('<li><a data-ajax_panel="content" href="/admin/nabar/role/access/!', group, '">', group, '</a></li>')))
+			values.append(''.join(('<li><a data-ajax_panel="content" href="/', admin_path, '/nabar/role/access/!', group, '">', group, '</a></li>')))
 		
 		box = ''.join(values).join(('''<div class="i-panel i-panel-box">
 

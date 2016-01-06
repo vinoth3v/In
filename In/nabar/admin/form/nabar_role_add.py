@@ -148,6 +148,8 @@ class FormNabarRoleAddAdminFormer(FormFormer):
 			form.error_message = s('Unknown error occurred! Please try again later!')
 			form.has_errors = True
 			return False
-
-		form.redirect = '/admin/nabar/role'
+		
+		admin_path = IN.APP.config.admin_path
+		
+		form.redirect = admin_path + '/nabar/role'
 

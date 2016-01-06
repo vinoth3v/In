@@ -40,7 +40,7 @@ class Imager:
 			img = self.filters[filter[0]](img, filter[1])
 		
 		os.makedirs(os.path.dirname(save_to), exist_ok = True)
-		img.save(save_to)
+		img.save(save_to, optimize = True, quality = IN.APP.config.image_style_quality)
 	
 	def resize(self, img, args):
 		size = args['size']

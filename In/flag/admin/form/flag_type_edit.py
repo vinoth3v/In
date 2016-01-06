@@ -343,5 +343,7 @@ class FlagTypeEditFormFormer(In.entity.EntityEditFormFormer):
 		if form.has_errors:
 			return
 		
-		form.redirect = 'admin/structure/entity/!FlagType/list'
+		admin_path = IN.APP.config.admin_path
+		
+		form.redirect = admin_path + '/structure/entity/!FlagType/list'
 		

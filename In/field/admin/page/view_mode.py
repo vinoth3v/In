@@ -16,6 +16,8 @@ def field_admin_action_entity_display_ui(context, action, entity_type, entity_bu
 	
 	entity_field_config = fielder.entity_field_config
 	
+	admin_path = IN.APP.config.admin_path
+	
 	subs = ''
 	if entity_type in entity_field_config and entity_bundle in entity_field_config[entity_type]:
 		
@@ -29,8 +31,8 @@ def field_admin_action_entity_display_ui(context, action, entity_type, entity_bu
 			subs.append(''.join(('''<li class="i-nestable-item" data-i-nestable={handleClass:'i-nestable-handle'}>
 				<div class="i-nestable-item">
 				<div class="i-nestable-panel">
-					<i class="i-icon-bars i-nestable-handle"></i> <span data-nestable-action="toggle"></span> 
-					<a data-ajax_type="POST" data-ajax_panel="content" href="/admin/structure/entity/!''', entity_type, '/bundle/!', entity_bundle, '/display/!', view_mode, '/field/!', field_name, '/field_formatter_form">', field_name, '</a>', 
+					<i class="i-icon-bars i-nestable-handle"></i> <span data-nestable-action="toggle"></span>''', 
+					'<a data-ajax_type="POST" data-ajax_panel="content" href="/', admin_path, '/structure/entity/!''', entity_type, '/bundle/!', entity_bundle, '/display/!', view_mode, '/field/!', field_name, '/field_formatter_form">', field_name, '</a>', 
 				'<div id="', entity_type, '_', entity_bundle, '_', field_name, '_field_formatter_config"></div>',
 				'</div></div></li>'
 			)))
@@ -63,6 +65,6 @@ def field_admin_action_entity_display_ui(context, action, entity_type, entity_bu
 		'id' : 'copi-field-displai-configuration',
 		'css' : ['no-ajax ajax-modal i-button i-button-small'],
 		'value' : s('Copy configuration'),
-		'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!', view_mode, '/copi-configuration')),
+		'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!', view_mode, '/copi-configuration')),
 	})
 	

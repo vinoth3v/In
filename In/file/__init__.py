@@ -149,10 +149,15 @@ def process_uploaded_file(fileobj):
 	return {'__upload__' : True, 'path' : file_path}
 
 def get_random_file(ext):
+	
+	os_path_join = os.path.join
+	os_path_exists = os.path.exists
+	tmp_file_dir = IN.APP.config.tmp_file_dir
+	
 	while True: # get a new file name
-		file_name = str(random.getrandbits(128))
-		file_path = os.path.join(IN.APP.config.tmp_file_dir, file_name + ext)
-		if not os.path.exists(file_path):
+		file_name = str(random.getrandbits(128)) + ext
+		file_path = os_path_join(tmp_file_dir, file_name)
+		if not os_path_exists(file_path):
 			return file_path
 
 
@@ -164,23 +169,37 @@ def create_file_entity(path, default_file_bundle):
 		IN.logger.debug(path + ' not exists')
 		return
 	
+	os_path_join = os.path.join
+	os_path_exists = os.path.exists
+	
 	size = os.path.getsize(path)
 	
 	# returns bytes
 	mime = magic.from_file(path, mime=True).decode("utf-8")
 	mime1, mime2 = mime.split('/', 1)
 	
+	# TODO: private files
 	public_file_dir = IN.APP.config.public_file_dir
 	
-	save_to = 'images/' + str(IN.context.nabar.id)
-	
-	save_to = os.path.join(public_file_dir, save_to)						
+	# TODO: custom nabar id
+	save_to_prefix = 'images/' + str(IN.context.nabar.id)
+	save_to_prefix = os.path.join(public_file_dir, save_to_prefix)						
 	
 	# create folder
-	os.makedirs(save_to, exist_ok = True)
-	file_name = os.path.split(path)[1]
-	save_to = os.path.join(save_to, file_name)
+	os.makedirs(save_to_prefix, exist_ok = True)
 	
+	
+	file_name = os.path.split(path)[1]
+	save_to = os_path_join(save_to_prefix, file_name)
+	
+	tmp, ext = os.path.splitext(file_name)
+	
+	while os_path_exists(save_to):
+		
+		file_name = str(random.getrandbits(128)) + ext
+		save_to = os_path_join(save_to_prefix, file_name)
+		
+		
 	shutil.move(path, save_to)
 	
 	path = save_to

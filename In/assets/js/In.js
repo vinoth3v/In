@@ -1,3 +1,7 @@
+// fix
+window.console = window.console || {};
+console.log = console.log || function (a) {};
+
 window.IN = { config: {}, callbacks:{}, window_in_focus:true, audioElement : document.createElement('audio') };
 
 define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
@@ -720,8 +724,34 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
         IN.audioElement.play();
       });
     }
-
-    // only once
+	
+	IN.showAjaxModal = function(el) {
+		var $el = $(el);
+		var id = $el.data('modal_id'); if (!id) { id = 'i-ajax-modal'; }
+		var modal_class = $el.data('modal_class'); if (!modal_class) { modal_class = ''; }
+		var modal_options = $el.data('modal_options'); if (!modal_options) { modal_options = {}; }
+		var ajax_args = $el.data('ajax_args'); if (!ajax_args) { ajax_args = {}; }
+		
+		ajax_args['modal_id'] = id;
+		$('#' + id).remove(); // delete old, content not updating
+		$('<div id="'+id+'" class="i-modal"><div class="i-modal-dialog ' + modal_class + '"><a class="i-modal-close i-close"></a><div class="modal-content i-modal-spinner"></div></div></div>').appendTo('body');
+		var trigger = 'i-ajax-modal-trigger';
+		var $a = $('<a id="'+trigger+'"></a>');
+		var url = $el.attr('href'); if (!url) { url = $el.data('href'); } if (!url) { url = $el.data('url'); }
+		IN.ajax[trigger] = new IN.ajax(trigger, $a[0], {
+			element_id : trigger, 
+			event : 'click', 
+			url : url, 
+			'type' : 'POST', 
+			modal : true,
+			ajax_args : ajax_args
+		});
+		var modal = UIkit.modal('#' + id, modal_options);
+		modal.show();
+		$a.click(); // ajax load trigger
+	}
+	
+    
 
 
     IN.on('dom', 'In.ajax', 'a-ajax', {
@@ -808,7 +838,7 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
                 added++;
             });
             if (added) {
-                IN.lazy_load(lazys, 2000); // TODO: dynamic delay
+                IN.lazy_load(lazys, 1000); // TODO: dynamic delay
             }
 
 
@@ -817,28 +847,8 @@ define('In', ['jQuery', 'once', 'jQuery_form',  'uikit!notify' ], function() {
                 $el.click(function(event) {
                     event.preventDefault(); event.stopPropagation();
 					
-					var id = $el.data('modal_id'); if (!id) { id = 'i-ajax-modal'; }
-					var modal_class = $el.data('modal_class'); if (!modal_class) { modal_class = ''; }
-					var modal_options = $el.data('modal_options'); if (!modal_options) { modal_options = {}; }
-					var ajax_args = $el.data('ajax_args'); if (!ajax_args) { ajax_args = {}; }
+					IN.showAjaxModal($el);
 					
-					ajax_args['modal_id'] = id;
-                    $('#' + id).remove(); // delete old, content not updating
-                    $('<div id="'+id+'" class="i-modal"><div class="i-modal-dialog ' + modal_class + '"><a class="i-modal-close i-close"></a><div class="modal-content i-modal-spinner"></div></div></div>').appendTo('body');
-                    var trigger = 'i-ajax-modal-trigger';
-                    var $a = $('<a id="'+trigger+'"></a>');
-                    var url = $el.attr('href'); if (!url) { url = $el.data('href'); } if (!url) { url = $el.data('url'); }
-                    IN.ajax[trigger] = new IN.ajax(trigger, $a[0], {
-						element_id : trigger, 
-						event : 'click', 
-						url : url, 
-						'type' : 'POST', 
-						modal : true,
-						ajax_args : ajax_args
-					});
-                    var modal = UIkit.modal('#' + id, modal_options);
-                    modal.show();
-                    $a.click(); // ajax load trigger
                 });
             });
 

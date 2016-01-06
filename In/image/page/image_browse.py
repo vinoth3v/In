@@ -27,8 +27,11 @@ def action_image_browse_form(context, action, **args):
 				element_id : modal,			
 			}
 			context.response = In.core.response.PartialResponse(output = output)
-		else:
-			context.response.output.add(form)
+		
+		# we dont need normal page output
+		# lister will handle the pager
+		#else:
+		#	context.response.output.add(form)
 			
 	except:
 		IN.logger.debug()

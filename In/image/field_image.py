@@ -75,6 +75,7 @@ class FieldImageFielder(FieldFileFielder):
 		entitier = IN.entitier
 		themer = IN.themer
 		
+		new_idx = 0
 		added_max_idx = 1
 		for lang, idx_val in field_value.items():
 			if lang not in field_languages:
@@ -213,7 +214,7 @@ class FieldImageBrowserFielder(FieldImageFielder):
 		input_field = Object.new('TextDiv', {
 			'id' : id + '_button',
 			'name' : name + '_button',
-			'value' : s('Select image'),
+			'value' : '<i class="i-icon-camera"></i> ' + s('Select image'),
 			'css' : ['i-button ajax-modal'],
 			'weight' : weight,
 			'attributes' : {

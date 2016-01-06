@@ -45,6 +45,13 @@ class PageThemer(ObjectThemer):
 		args['doctype'] = '<!DOCTYPE html>'
 		args['head_tags'] = ''
 		args['html_attributes'] = ''
+		
+		cdn = IN.APP.config.cdn
+		
+		args['cdn_img'] = cdn['img']
+		args['cdn_css'] = cdn['css']
+		args['cdn_js'] = cdn['js']
+		
 
 	#def theme_done(self, obj, format, view_mode, args):
 		#super().theme_done(self, obj, format, view_mode, args)

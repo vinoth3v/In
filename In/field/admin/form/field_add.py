@@ -90,9 +90,12 @@ class FormFieldAdminAddField(Form):
 			'value' : s('Add new field'),
 			'css' : ['i-button i-button-primary']
 		})
+		
+		admin_path = IN.APP.config.admin_path
+		
 		set.add('Link', {
 			'value' : s('Cancel'),
-			'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field')),
+			'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field')),
 			'css' : ['i-button']
 		})
 		#set = self.add(type = 'FieldSet', data = {
@@ -151,7 +154,7 @@ class FormFieldAdminAddFieldFormer(FormFormer):
 		data = {
 			'title' : title,
 		}
-		
+		admin_path = IN.APP.config.admin_path
 		fielder = IN.fielder
 		try:
 			created = fielder.__create_new_field__(entity_type, entity_bundle, field_type, field_name, status, weight, data)
@@ -162,7 +165,7 @@ class FormFieldAdminAddFieldFormer(FormFormer):
 				form.error_message = s('Unknown error occurred while creating new field!')
 				return
 			
-			form.redirect = ''.join(('admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit'))
+			form.redirect = ''.join((admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/field/!', field_name, '/edit'))
 			
 		except Exception as e:
 			IN.logger.debug()

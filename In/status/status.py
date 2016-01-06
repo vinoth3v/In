@@ -70,7 +70,20 @@ class StatusEntitier(In.entity.EntityEntitier):
 
 			
 		return output
+	
+	def entity_title(self, entity):
 
+		title_field_name = 'field_status_body'
+		
+		if title_field_name in entity:
+			try:
+				title = entity[title_field_name].value[''][0]['value']				
+				return texter.format(title, 'tinyteaser')				
+			except Exception as e:
+				IN.logger.debug()
+		
+		return ': '.join((entity.__type__, str(entity.id)))
+		
 @IN.register('Status', type = 'Model')
 class StatusModel(In.entity.EntityModel):
 	'''Status Model'''

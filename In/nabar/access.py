@@ -9,6 +9,10 @@ def access_keys():
 		group : OrderedDict()
 	}
 
+	keys[group]['admin_nabar'] = {
+		'title' : s('(Administer) Allow nabar to do ANY action on site nabar'),
+		'flag' : 'danger',
+	}
 	keys[group]['admin_nabar_role_access'] = {
 		'title' : s('(Administer) Allow nabar to manage nabar roles and access'),
 		'flag' : 'danger',

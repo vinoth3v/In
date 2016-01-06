@@ -19,12 +19,14 @@ def page_menu_tab_admin_structure_entity___bundle___display__(context):
 	
 	if not view_modes:
 		return
-		
+	
+	admin_path = IN.APP.config.admin_path
+	
 	tab = context.page_menu_sub_tab_2
 	for mode in sorted(view_modes, key = lambda v: v):
 		li = tab.add('Li', {
 			'css' : ['i-active' if view_mode == mode else '']
 		}).add('Link', {
-			'href' : ''.join(('/admin/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!', mode)),
+			'href' : ''.join(('/', admin_path, '/structure/entity/!', entity_type, '/bundle/!', entity_bundle, '/display/!', mode)),
 			'value' : s(mode),
 		})

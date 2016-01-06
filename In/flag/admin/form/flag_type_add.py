@@ -314,7 +314,9 @@ class FlagTypeAddFormFormer(In.entity.EntityAddFormFormer):
 		
 		flag_type_entity.data['flag_status'] = flag_status
 		
-		form.redirect = entity_type.join(('admin/structure/entity/!', '/list'))
+		admin_path = IN.APP.config.admin_path
+		
+		form.redirect = ''.join((admin_path + '/structure/entity/!', entity_type, '/list'))
 		
 	def submit(self, form, post):
 		
@@ -323,5 +325,7 @@ class FlagTypeAddFormFormer(In.entity.EntityAddFormFormer):
 		if form.has_errors:
 			return
 		
-		form.redirect = 'admin/structure/entity/!FlagType/list'
+		admin_path = IN.APP.config.admin_path
+		
+		form.redirect = admin_path + '/structure/entity/!FlagType/list'
 		

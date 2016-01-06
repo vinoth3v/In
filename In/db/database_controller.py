@@ -48,8 +48,8 @@ class DatabaseController:
 	def connection(self):
 		conn = self.__connection__
 		
-		if conn.connection.isexecuting():
-			# connection is in use
+		if conn.connection.isexecuting() or conn.connection.closed:
+			# connection is in use or closed
 			# create a new one
 			conn = self.connect(activate = False)
 			

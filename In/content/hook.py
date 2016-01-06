@@ -33,6 +33,11 @@ def page_menu_tab_node___anything_after(context):
 		
 		if entity is None or entity.status == entitier.STATUS_DELETED:
 			return
+			
+		if not IN.entitier.access('edit', entity):
+			
+			# we don't need just a view tab alone
+			return
 		
 		li = tab.add('Li', {
 			'css' : ['i-active' if parts_len == 2 else ''],
@@ -42,16 +47,15 @@ def page_menu_tab_node___anything_after(context):
 			'value' : s('View'),
 		})
 		
+		li = tab.add('Li', {
+			'css' : ['i-active' if parts_len == 3 and path_parts[2] == 'edit' else ''],
+			'weight' : 1,
+		}).add('Link', {
+			'href' : ''.join(('/node/', entity_id, '/edit')),
+			'value' : s('Edit'),
+			'attributes' : {
+				'data-ajax_type' : 'POST',
+			}
+		})
 		
-		if IN.entitier.access('edit', entity):
-			li = tab.add('Li', {
-				'css' : ['i-active' if parts_len == 3 and path_parts[2] == 'edit' else ''],
-				'weight' : 1,
-			}).add('Link', {
-				'href' : ''.join(('/node/', entity_id, '/edit')),
-				'value' : s('Edit'),
-				'attributes' : {
-					'data-ajax_type' : 'POST',
-				}
-			})
 		

@@ -3,6 +3,7 @@ from .page import *
 @IN.hook
 def actions():
 	actns = {}
+	
 	actns['nabar/register'] = {
 		'title' : 'Nabar Register',
 		'handler' : nabar_register,
@@ -20,8 +21,7 @@ def actions():
 		'title' : 'Nabar logout',
 		'handler' : nabar_logout,
 	}
-	
-	
+		
 	actns['nabar/{entity_id}'] = {
 		'handler' : nabar_view,
 	}

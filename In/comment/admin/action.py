@@ -2,7 +2,9 @@
 def actions():
 	actns = {}
 
-	actns['admin/structure/entity/{entity_type}/map'] = {
+	admin_path = IN.APP.config.admin_path
+	
+	actns[admin_path + '/structure/entity/{entity_type}/map'] = {
 		'title' : 'Entity to comment map',
 		'handler' : action_admin_entity_comment_map,
 	}
@@ -18,7 +20,7 @@ def action_admin_entity_comment_map(context, action, **args):
 
 	page = context.response.output
 
-	context.asset.add_js('/files/libraries/uikit-2.22.0/dist/js/components/accordion.min.js', 'accordion')
+	context.asset.add_js('/files/libraries/uikit-2.24.3/dist/js/components/accordion.min.js', 'accordion')
 	
 	page.add(frm)
 

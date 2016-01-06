@@ -244,7 +244,8 @@ class NabarPictureThemer(In.html.tags_themer.HTMLObjectThemer):
 		args['nabar_name'] = nabar.name
 		args['nabar_id'] = nabar.id
 		
-		args['nabar_picture_uri'] = nabar.picture_uri(obj.style)
+		cdn = IN.APP.config.cdn.get('img', '')
+		args['nabar_picture_uri'] = cdn + nabar.picture_uri(obj.style)
 		
 		args['image_style'] = obj.style
 		

@@ -12,6 +12,8 @@ class TaskerContext(In.core.context.Context, WebSocketServerProtocol):
 		dummy = lambda: ''
 		super().__init__(app, {}, dummy, **args)
 		
+		self.sleep_seconds_between_task = IN.APP.config.tasker['sleep_seconds_between_task']
+		
 	def run(self):
 		
 		while True:
@@ -22,7 +24,7 @@ class TaskerContext(In.core.context.Context, WebSocketServerProtocol):
 				IN.logger.debug()
 			
 			
-			time.sleep(2)
+			time.sleep(self.sleep_seconds_between_task)
 			
 			
 			try:
@@ -127,7 +129,12 @@ class Tasker:
 			
 			# find new task
 			q = '''SELECT * FROM log.task 
-				WHERE status = 1 
+				WHERE
+					status = 1 AND 
+					(
+						run_at <= CURRENT_TIMESTAMP OR
+						run_at IS NULL
+					)
 				ORDER BY weight, created
 				limit 1
 				FOR UPDATE
@@ -136,7 +143,7 @@ class Tasker:
 			cursor = db.execute(q)
 			
 			if cursor.rowcount == 0:
-				connection.rollback()
+				connection.rollback() # release FOR UPDATE
 				return
 			
 			row = cursor.fetchone()

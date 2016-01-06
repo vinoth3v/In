@@ -121,7 +121,7 @@ class PGSqlDBEngine(In.db.DBEngineBase):
 			
 		try:
 			
-			IN.logger.debug(sql)
+			#IN.logger.debug(sql)
 			
 			c.execute(sql, args)
 		

@@ -128,7 +128,9 @@ class FormEntityAdminAddBundle(FormFormer):
 
 			connection.commit()
 			
-			form.redirect = form.entity_type.join(('admin/structure/entity/!', '/bundle'))
+			admin_path = IN.APP.config.admin_path
+			
+			form.redirect = ''.join((admin_path, '/structure/entity/!', form.entity_type, '/bundle'))
 			
 		except Exception as e:
 			connection.rollback()

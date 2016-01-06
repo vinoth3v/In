@@ -474,16 +474,29 @@ class HTMLModalPopup(TextDiv):
 
 
 class HTMLTableColumn(Tag):
-	''''''
+	
 	__tag__ = 'td'
+
+class TD(HTMLTableColumn):
+	''''''
+
 
 class HTMLTableHColumn(HTMLTableColumn):
 	__tag__ = 'th'
 
+class TH(HTMLTableHColumn):
+	''''''
+
+
 class HTMLTableRow(Tag):
-	__allowed_children__ = HTMLTableColumn
+	__allowed_children__ = (HTMLTableColumn, TD)
 	__tag__ = 'tr'
 
+
+
+class TR(HTMLTableRow):
+	''''''
+	
 
 class HTMLTableRowContainer(Tag):
 	__allowed_children__ = HTMLTableRow
@@ -492,11 +505,24 @@ class HTMLTableRowContainer(Tag):
 class HTMLTableHeader(HTMLTableRowContainer):
 	__tag__ = 'thead'
 
+class THead(HTMLTableHeader):
+	''''''
+
+
 class HTMLTableFooter(HTMLTableRowContainer):
 	__tag__ = 'tfoot'
 
+class TFoot(HTMLTableFooter):
+	''''''
+
+
 class HTMLTableBody(HTMLTableRowContainer):
 	__tag__ = 'tbody'
+
+
+class TBody(HTMLTableBody):
+	''''''
+
 
 class HTMLTable(Tag):
 	__tag__ = 'table'
@@ -518,3 +544,7 @@ class HTMLTable(Tag):
 		})
 
 		self.css.append('i-table')
+
+
+class Table(HTMLTable):
+	''''''

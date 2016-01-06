@@ -2,8 +2,9 @@
 @IN.hook
 def actions():
 	actns = {}
-
-	actns['admin/structure/entity/{entity_type}/bundle/{entity_bundle}/manage/vakai'] = {
+	
+	admin_path = IN.APP.config.admin_path
+	actns[admin_path + '/structure/entity/{entity_type}/bundle/{entity_bundle}/manage/vakai'] = {
 		'title' : 'Manage Vakai',
 		'handler' : vakai_admin_action_manage,
 	}

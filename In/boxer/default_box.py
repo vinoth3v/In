@@ -11,7 +11,7 @@ def decide_page_boxes_alter(boxes, context, page, format):
 	boxes.append(['BoxPageMenuTab', 'content', {
 		'type' : 'BoxPageMenuTab',
 		'data' : {
-			'weight' : -2,
+			'weight' : -5,
 		}
 	}])
 	
@@ -19,7 +19,7 @@ def decide_page_boxes_alter(boxes, context, page, format):
 		boxes.append(['BoxPageTitle', 'content', {
 			'type' : 'BoxPageTitle',
 			'data' : {
-				'weight' : -3,
+				'weight' : -10,
 			}
 		}])
 	

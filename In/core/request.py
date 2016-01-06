@@ -115,7 +115,7 @@ class Request:
 		self.init_cookie(context.environ.get('HTTP_COOKIE', ''))
 		
 		#pprint(context.environ)
-		#pprint('PPPOOSSSSSSST', self.args)
+		pprint('PPPOOSSSSSSST', self.args)
 	
 	def init_cookie(self, cookie = None):
 		# load the cookie

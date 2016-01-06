@@ -25,24 +25,40 @@ class ObjectLister(HTMLObject):
 	
 	empty_text = None
 	
-	# objects will be added to this if set
+	# lister object itself will be added to this if set
+	# not confused with content panel 
+	# container -> lister -> content_panel -> objects
 	container = None
 	url = None
 	
 	pager = None
+	
+	add_function = None
 	
 	def __init__(self, data = None, items = None, **args):
 		
 		super().__init__(data, items, **args)
 		
 		content_panel = data.get('content_panel', {})
-		content_panel.update({
-			'id' : 'content_panel',
-			'weight' : 0,
-			'default_children_view_mode' : self.view_mode
-		})
 		
-		self.content_panel = self.add('TextDiv', content_panel)
+		if not isinstance(content_panel, Object):
+			
+			type_of_content_panel = type(content_panel)
+			
+			if type_of_content_panel is str and content_panel: # content panel type
+				content_panel_type = content_panel
+				content_panel_data = {}
+			elif type_of_content_panel is dict:
+				content_panel_type = 'TextDiv'
+				content_panel_data = content_panel
+			
+			content_panel_data.update({
+				'id' : 'content_panel',
+				'weight' : 0,
+				'default_children_view_mode' : self.view_mode
+			})
+			
+			self.content_panel = self.add(content_panel_type, content_panel_data)
 		
 		self.content_panel.css.append('content-panel')
 		
@@ -136,6 +152,25 @@ class ObjectLister(HTMLObject):
 					'method' : 'replace',
 					'args' : [''.join(('#', self.id, ' .pager-panel')), pager_output]
 				})
+				
+				# hack
+				# if grid is dynamic, reinit it
+				
+				if 'i-grid-dynamic' in self['content_panel'].css:
+					
+					script = '''
+						require(['uikit!grid'], function(uigrid) {
+							$('.i-grid-dynamic').each(function() {
+								$(this).trigger('display.uk.check');
+							});
+						});
+					'''
+					
+					context.response.output.append({
+						'method' : 'script',
+						'args' : [script]
+					})
+					
 			
 			
 	@property
@@ -197,10 +232,13 @@ class ObjectLister(HTMLObject):
 						if self.list_object_class:
 							entity.css.append(self.list_object_class)
 						
-						if self.list_object_wrapper is None:
-							content_panel.add(entity)
+						if self.add_function:
+							self.add_function(self, entity, content_panel, weight)
 						else:
-							content_panel.add(self.list_object_wrapper).add(entity)
+							if self.list_object_wrapper is None:
+								content_panel.add(entity)
+							else:
+								content_panel.add(self.list_object_wrapper).add(entity)
 						weight += 1
 		else:
 			pass
