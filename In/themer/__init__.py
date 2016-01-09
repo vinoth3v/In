@@ -14,6 +14,7 @@ from .theme_formats import *
 from .object_themer import *
 from .page_themer import *
 
+from .object_theme_cacher import *
 
 @IN.register
 def register():
@@ -30,6 +31,10 @@ def register():
 			'Object' : {								# type of object - arg to class members
 				'Themer' : {						# key
 					'name' : 'Themer',				# member name
+					'instance' : 'instance',			# type of instance
+				},
+				'ThemeCacher' : {						# key
+					'name' : 'ThemeCacher',				# member name
 					'instance' : 'instance',			# type of instance
 				},
 			},

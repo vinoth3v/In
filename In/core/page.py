@@ -18,49 +18,57 @@ class Page(Object):
 		data['panels'] = data.get('panels', {})
 		data['messages'] = data.get('messages', In.logger.Logs())
 		data['breadcrumb'] = data.get('breadcrumb', BreadCrumb(child_separator = ' - '))
-
-		super().__init__(data, items, **args)
+		
+		my_super = super()
+		
+		my_super.__init__(data, items, **args)
 
 
 		# super() : adding panel to page instead of add object to panel
 		# add pass panel to None
 		
-		super().add('SiteHeader', {
+		super_add = my_super.add
+		
+		super_add('SiteHeader', {
 			'id' : 'header',
 			'css' : ['site-header']
 		})
-		super().add('Object', {
+		super_add('Object', {
 			'id' : 'promotion',
 			'css' : ['promoted']
 		})
 		
 		# add default panel = content
-		super().add(self.__panel_type__, {
+		super_add(self.__panel_type__, {
 			'id' : self.def_content_panel,
 			'css' : ['main-content']
 		})
 
-		super().add('Aside', {
+		super_add('Aside', {
 			'id' : 'sidebar1',
 			'css' : ['sidebar1']
 		})
-		super().add('Aside', {
+		super_add('Aside', {
 			'id' : 'sidebar2',
 			'css' : ['sidebar2']
 		})
-		super().add('Aside', {
+		super_add('Aside', {
 			'id' : 'sidebar3',
 			'css' : ['sidebar3']
 		})
-		super().add('Aside', {
+		super_add('Aside', {
 			'id' : 'sidebar4',
 			'css' : ['sidebar4']
 		})
-		super().add('SiteFooter', {
+		super_add('SiteFooter', {
 			'id' : 'footer',
 			'css' : ['site-footer'],
 		})
-
+		
+		super_add('Aside', {
+			'id' : 'content2',
+			'css' : ['content2']
+		})
 
 	def add(self, obj = None, type = 'Object', panel = def_content_panel, **args):
 		'''Add Object to page.

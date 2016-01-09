@@ -42,21 +42,22 @@ class WSContext(Context, WebSocketServerProtocol):
 		}
 		
 		'''
-		# TODO: init nabar, environ
+		
+		headers = request.headers
 		
 		# always set
 		self.environ['SERVER_PORT'] = 80
 		self.environ['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'	# ajax on
 		
-		self.environ['HTTP_HOST'] = request.headers.get('host', '')
-		self.environ['HTTP_X_FORWARDED_FOR'] = request.headers.get('x-forwarded-for', '')
-		self.environ['HTTP_COOKIE'] = request.headers.get('cookie', '')
-		self.environ['HTTP_USER_AGENT'] = request.headers.get('user-agent', '')
-		self.environ['HTTP_ACCEPT'] = request.headers.get('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+		self.environ['HTTP_HOST'] = headers.get('host', '')
+		self.environ['HTTP_X_FORWARDED_FOR'] = headers.get('x-forwarded-for', '')
+		self.environ['HTTP_COOKIE'] = headers.get('cookie', '')
+		self.environ['HTTP_USER_AGENT'] = headers.get('user-agent', '')
+		self.environ['HTTP_ACCEPT'] = headers.get('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
 		
-		self.environ['sec-websocket-key'] = request.headers.get('sec-websocket-key', '')
-		self.environ['sec-websocket-version'] = request.headers.get('sec-websocket-version', '')
-		self.environ['sec-websocket-extensions'] = request.headers.get('sec-websocket-extensions', '')
+		self.environ['sec-websocket-key'] = headers.get('sec-websocket-key', '')
+		self.environ['sec-websocket-version'] = headers.get('sec-websocket-version', '')
+		self.environ['sec-websocket-extensions'] = headers.get('sec-websocket-extensions', '')
 		
 		# init cookie		
 		self.request.init_cookie(self.environ['HTTP_COOKIE'])
@@ -66,7 +67,6 @@ class WSContext(Context, WebSocketServerProtocol):
 		
 		try:
 			
-			# ignore nabar for static files path
 			nabar_id = IN.nabar.auth_cookie(self)
 
 			if nabar_id:
@@ -156,12 +156,21 @@ class WSContext(Context, WebSocketServerProtocol):
 		# inbuilt by autobahn
 		#self.factory = None
 		
+		
 		nabar_id = self.nabar.id
 		if nabar_id in IN.APP.contexts:
 			try:
 				IN.APP.contexts[nabar_id].remove(self)
 			except Exception as e:
 				pass
-			
+		
+		WebSocketServerProtocol.onClose(self, wasClean, code, reason)
+		
 		IN.APP.context_pool.free(self)
-	
+		
+	def __free__(self):
+		
+		del self.messages
+		del self.ws_request
+		
+		Context.__free__(self)

@@ -9,10 +9,10 @@ class Stringer:
 	'''String translator'''
 
 	
-	def __init__(self, site_language = 'ta'):
+	def __init__(self):
 
 		#self.__collect__ = False
-		self.site_language = site_language
+		#self.site_language = site_language
 
 		# strings = {language : {context : strings}}
 		self.strings = defaultdict(lambda : defaultdict(dict))
@@ -65,10 +65,10 @@ class Stringer:
 
 		#language = self.site_language
 		if language is None:
-			try: # context may not available
-				language = IN.context.nabar.language
-			except AttributeError:
-				language = self.site_language
+			try:
+				language = IN.context.language
+			except AttributeError as e:
+				language = IN.APP.config.language
 		
 		if language != 'en': # get translation only if not en
 			try:

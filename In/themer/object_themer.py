@@ -9,7 +9,6 @@ from In.themer.object_themer_base import *
 class ObjectThemer(ObjectThemerBase):
 
 	
-
 	sort_children = True #False #
 	merge_children = True
 	
@@ -20,7 +19,10 @@ class ObjectThemer(ObjectThemerBase):
 	__invoke_theme_format_view_mode_alter__ = False
 
 	def __init__(self, objcls, key, mem_type):
-		pass
+		''''''
+		
+		# we need this __init__
+		# dont remove
 
 	def theme(self, obj, format, view_mode, args):
 		'''themer method is reponsible for themering IN 'Object' Object.
@@ -88,24 +90,19 @@ class ObjectThemer(ObjectThemerBase):
 				weight = child.weight #or idx
 				
 				subargs = {
-					'__theme_engine__' : args['__theme_engine__'],
 					'context'	: args['context'],
-					'item_index' : child.weight,
+					'item_index' : weight,
 				}
 				
-				if obj.default_children_view_mode is not None:
-					sub_view_mode = obj.default_children_view_mode
-				else:
-					sub_view_mode = view_mode
-					
+				sub_view_mode = obj.default_children_view_mode or view_mode
+				
 				child_theme_output = _theme(child, format, sub_view_mode, subargs)
 
-				children[child.id] = { # keep order
+				children[child.id] = {
 					'content' : child_theme_output,
-					'weight' : weight,
+					'weight' : weight, # keep order
 				}
-				#print('1111111111111', id, child)
-				#pprint(id, theme_output)
+				
 			except Exception as e:
 				IN.logger.debug()
 		
@@ -202,7 +199,12 @@ class ObjectThemer(ObjectThemerBase):
 			args['children'] = obj.theme_current_output['output']['children']
 		
 		args['id'] = obj.id
-
+		
+		cdn = IN.APP.config.cdn
+		
+		args['cdn_img'] = cdn['img']
+		args['cdn_css'] = cdn['css']
+		args['cdn_js'] = cdn['js']
 
 	def theme_plateit(self, obj, format, view_mode, args):
 
@@ -302,9 +304,8 @@ class ThemeArgsThemer(ObjectThemer):
 				weight = child.weight #or idx
 				
 				subargs = {
-					'__theme_engine__' : args['__theme_engine__'],
 					'context'	: args['context'],
-					'item_index' : child.weight,
+					'item_index' : weight,
 				}
 				
 				subargs.update(obj.args)
@@ -315,9 +316,9 @@ class ThemeArgsThemer(ObjectThemer):
 				# theme the children in specific view_mode
 				child_theme_output = _theme(child, sub_format, sub_view_mode, subargs)
 
-				children[child.id] = { # keep order
+				children[child.id] = { 
 					'content' : child_theme_output,
-					'weight' : weight,
+					'weight' : weight, # keep order
 				}
 				
 			except Exception as e:

@@ -4,6 +4,8 @@ import base64
 import hashlib
 import urllib
 import inspect
+import shutil
+
 from functools import *
 
 from In.core.object_meta import ObjectMetaBase
@@ -16,12 +18,15 @@ class CacherException(Exception):
 class CacherContainer(dict):
 
 	def __missing__(self, bin):
-		if bin in IN.APP.config.cache_bins: # mostly no
-			bin_def = IN.APP.config.cache_bins[bin]
+		
+		cache_bins = IN.APP.config.cache_bins
+		
+		if bin in cache_bins: # mostly no
+			bin_def = cache_bins[bin]
 		else:
 			try:
 				# build from default CONFIG!
-				bin_def = IN.APP.config.cache_bins['default']
+				bin_def = cache_bins['default']
 			except KeyError:
 				raise CacherException(s('Cache config for the bin $bin is undefined!', {'bin' : bin}))
 
@@ -101,8 +106,10 @@ class Cacher(CacherBase):
 	'''
 	def __init__(self, bin, **args):
 		self.bin = bin
-	
-
+		
+		if not self.bin or self.bin in ['/', '.', '..']:
+			self.bin = 'default'
+			raise RuntimeError('Unsafe Cache bin!')
 
 class CacheFile(Cacher):
 	'''Saves object to file.
@@ -111,9 +118,15 @@ class CacheFile(Cacher):
 	def __init__(self, bin, base_dir, digest = False):
 		'''Initiate the File Cache.
 
-		digest: false it if you are sure that cache keys will be file name safe for this cache bin.
+		digest: false it if you are sure that cache keys will be "file name safe" for this cache bin.
 		'''
+		
 		super().__init__(bin)
+		
+		if not base_dir or base_dir in ['/', '.', '..']:
+			# security
+			base_dir = os.path.join(IN.APP.config.tmp_file_dir, 'cache')
+		
 		# always add bin, so cahce keys will not be mixed up with
 		# other bins if base path is default
 		self.base_dir = os.path.join(base_dir, bin)	# base dir path for this bin
@@ -180,10 +193,10 @@ class CacheFile(Cacher):
 	def set(self, key, value):
 		key = str(key)
 		key = self.get_file_name(key)
-
+		
 		# TODO: MAX SIZE
-		self.memory_cache[key] = value
-
+		#self.memory_cache[key] = value
+		
 		return self.__write__(key, value)
 
 	def __write__(self, file_name, value):
@@ -206,3 +219,17 @@ class CacheFile(Cacher):
 				os.remove(key)
 		except Exception as e:
 			IN.logger.debug()
+	
+	def remove_tree(self, key):
+		'''dangerous'''
+		
+		key = str(key)
+		
+		key = self.get_file_name(key)
+		
+		try:
+			shutil.rmtree(key, ignore_errors = True)
+		except Exception as e:
+			IN.logger.debug()
+		
+	

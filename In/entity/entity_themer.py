@@ -1,4 +1,4 @@
-
+from In.themer.object_theme_cacher import ObjectThemeCacher
 
 #********************************************************************
 #					ENTITY Themer
@@ -74,10 +74,15 @@ class EntityThemer(EntityBaseThemer):
 			obj[key].weight = weight
 
 	def theme_attributes(self, obj, format, view_mode, args):
-		obj.css.append(obj.__type__)
-		obj.css.append('view-mode-' + view_mode)
-		obj.css.append('-'.join((obj.__type__, str(obj.id))))
-		obj.css.append('-'.join((obj.__type__, obj.type)))
+		
+		obj_css_append = obj.css.append
+		obj___type__ = obj.__type__
+		
+		obj_css_append(obj___type__)
+		obj_css_append('view-mode-' + view_mode)
+		obj_css_append('-'.join((obj___type__, str(obj.id))))
+		obj_css_append('-'.join((obj___type__, obj.type)))
+		
 		super().theme_attributes(obj, format, view_mode, args)
 
 	def theme_process_variables(self, obj, format, view_mode, args):
@@ -114,3 +119,12 @@ class EntityThemer(EntityBaseThemer):
 			args['created'] = ' '.join((s(st('%B')), st("%d, %Y %I:%M"), s(st('%p'))))
 
 		args['entity_id'] = obj.id
+
+
+@IN.register('Entity', type = 'ThemeCacher')
+class EntityThemeCacher(ObjectThemeCacher):
+	''''''
+	
+	# TODO: allow in config
+	theme_cache_enabled = True # default
+	

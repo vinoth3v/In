@@ -37,8 +37,9 @@ class EntityEntitier(EntityEntitierBase):
 
 	@property
 	def cacher(self):
-		if self.__cacher__ is None:
-			self.__cacher__ = IN.cacher.cachers['entity_' + self.entity_type]
+		if self.__cacher__:
+			return self.__cacher__
+		self.__cacher__ = IN.cacher.cachers['entity_' + self.entity_type]
 		return self.__cacher__
 
 	def entity_title(self, entity):
@@ -316,11 +317,16 @@ class EntityEntitier(EntityEntitierBase):
 			try:
 				if self.entity_load_all:
 					self.cacher.remove('all')
+			except Exception:
+				IN.logger.debug()
+			
+			# clear by bundle
+			try:
 				if self.entity_load_all_by_bundle:
 					self.cacher.remove(entity.type)
 			except Exception:
 				IN.logger.debug()
-
+				
 			# hook invoke
 			if self.invoke_entity_hook:
 				IN.hook_invoke('_'.join(('entity_insert', entity.__type__, entity.type)), entity)
@@ -335,17 +341,34 @@ class EntityEntitier(EntityEntitierBase):
 		
 		result = entity.Model.update(entity, commit)
 
-		# clear the cache
-
+		# clear single
 		try:
 			self.cacher.remove(entity.id)
+		except Exception:
+			IN.logger.debug()
+		
+		# clear all
+		try:
 			if self.entity_load_all:
 				self.cacher.remove('all')
+		except Exception:
+			IN.logger.debug()
+		
+		# clear by bundle
+		try:
 			if self.entity_load_all_by_bundle:
 				self.cacher.remove(entity.type)
 		except Exception:
 			IN.logger.debug()
-
+		
+		# clear theme cache	
+		try:
+			theme_cacher = entity.ThemeCacher
+			if theme_cacher.theme_cache_enabled:
+				theme_cacher.remove_all_by_obj(entity)
+		except Exception:
+			IN.logger.debug()
+		
 		# hook invoke
 		if self.invoke_entity_hook:
 			IN.hook_invoke('_'.join(('entity_update', entity.__type__, entity.type)), entity)
@@ -362,16 +385,31 @@ class EntityEntitier(EntityEntitierBase):
 
 		# clear the cache
 		try:
-
 			self.cacher.remove(entity.id)
-			if self.entity_load_all:
-				self.cacher.remove('all')
-			if self.entity_load_all_by_bundle:
-				self.cacher.remove(entity.type)
-
 		except Exception:
 			IN.logger.debug()
-
+		
+		try:
+			if self.entity_load_all:
+				self.cacher.remove('all')
+		except Exception:
+			IN.logger.debug()
+		
+		try:
+			if self.entity_load_all_by_bundle:
+				self.cacher.remove(entity.type)
+		except Exception:
+			IN.logger.debug()
+			
+		# clear theme cache	
+		try:
+			theme_cacher = entity.ThemeCacher
+			if theme_cacher.theme_cache_enabled:
+				theme_cacher.remove_all_by_obj(entity)
+		except Exception:
+			IN.logger.debug()
+		
+		
 		# hook invoke
 		if self.invoke_entity_hook:
 			IN.hook_invoke('_'.join(('entity_delete', entity.__type__, entity.type)), entity)

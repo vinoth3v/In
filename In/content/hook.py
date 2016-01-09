@@ -12,7 +12,11 @@ def access():
 	
 @IN.hook
 def entity_insert_Content(entity):
-
+	
+	# hack
+	if hasattr(entity, 'create_comment_container') and not entity.create_comment_container:
+		return
+	
 	IN.commenter.create_comment_container(entity)
 
 @IN.hook

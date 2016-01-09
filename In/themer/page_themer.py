@@ -5,7 +5,9 @@ class PageThemer(ObjectThemer):
 
 	__invoke_theme_hook__ = True
 	merge_children = False
-
+	
+	process_assets_on_ajax_request = False
+	
 	def theme_attributes(self, obj, format, view_mode, args):
 		super().theme_attributes(obj, format, view_mode, args)
 
@@ -32,33 +34,33 @@ class PageThemer(ObjectThemer):
 		#args['head'] = theme_output.header_links
 		context = args['context']
 		
-		asset = context.asset
+		# do we need to process assets for ajax requests?
 		
-		IN.hook_invoke('asset_prepare', context)
-		IN.hook_invoke('asset_prepare', context)
-		
-		args['header_css'] = asset.theme_css('header')
-		args['footer_css'] = asset.theme_css('footer')
-		args['header_js'] = asset.theme_js('header')
-		args['footer_js'] = asset.theme_js('footer')
+		if not context.request.ajax or self.process_assets_on_ajax_request:
+			
+			asset = context.asset
+			
+			IN.hook_invoke('asset_prepare', context)
+			IN.hook_invoke('asset_prepare', context)
+			
+			args['header_css'] = asset.theme_css('header')
+			args['footer_css'] = asset.theme_css('footer')
+			args['header_js'] = asset.theme_js('header')
+			args['footer_js'] = asset.theme_js('footer')
 
-		args['doctype'] = '<!DOCTYPE html>'
-		args['head_tags'] = ''
-		args['html_attributes'] = ''
+			args['doctype'] = '<!DOCTYPE html>'
+			args['head_tags'] = ''
+			args['html_attributes'] = ''
 		
-		cdn = IN.APP.config.cdn
-		
-		args['cdn_img'] = cdn['img']
-		args['cdn_css'] = cdn['css']
-		args['cdn_js'] = cdn['js']
 		
 
 	#def theme_done(self, obj, format, view_mode, args):
 		#super().theme_done(self, obj, format, view_mode, args)
 	
 	def ajax_replaceable_elements(self):
-		return ['promotion', 'content', 'sidebar1', 'sidebar2']
-		
+		return ['promotion', 'content', 'content2', 'sidebar1', 'sidebar2']
+	
+	
 	def theme_items(self, obj, format, view_mode, args):
 		
 		layout = obj.add(obj.__page_layout_type__, {
@@ -79,18 +81,32 @@ class PageThemer(ObjectThemer):
 		
 		ajax_elements = {}
 
+		ajax_elements['ajax_page_replaceable'] = obj.new(obj.__page_layout_type__, {
+			'id' : 'ajax_page_replaceable'
+		})
+		
+		for element in self.ajax_replaceable_elements():
+			ajax_elements['ajax_page_replaceable'].add(obj[element])
+		
 		if panel is None:
-			ajax_elements['ajax_page_replaceable'] = obj.new(type=obj.__page_layout_type__, id='ajax_page_replaceable')
-			
-			for element in self.ajax_replaceable_elements():
-				ajax_elements['ajax_page_replaceable'].add(obj[element])
-				
+			return 	ajax_elements
 		else:
+			
+			layout = ajax_elements['ajax_page_replaceable']
+			
+			# remove it from response
+			del ajax_elements['ajax_page_replaceable']
+			
+			# call layout theme so that layout themer changes will be applied to panels
+			
+			IN.themer.theme(layout)
+			
 			# replace only these panels
 			panels = panel.split(',')
 			for panel in panels:
-				if panel in obj:
-					ajax_elements[panel] = obj[panel]
+				panel = panel.strip()
+				
+				ajax_elements[panel] = layout.get(panel, '')
 
 		return ajax_elements
 

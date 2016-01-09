@@ -253,9 +253,6 @@ class CommentListLazy(In.core.lazy.HTMLObjectLazy):
 		level = self.level
 		parent_id = self.parent_id
 
-		# add react comment box
-		#IN.context.asset.add_js('/files/assets/js/react.comment.js', 'react.comment')
-		
 		# always set new id
 		self.id = '_'.join(('CommentListLazy', parent_entity_type, str(parent_entity_id), str(parent_id)))
 		

@@ -102,18 +102,29 @@ def path_action():
 	actions = IN.APP.actions
 	context = IN.context
 	action  = ActionContainer()
-
-	path = context.request.path
+	
+	request = context.request
+	
+	path = request.path
 
 	if not path:
 		return None
-
+	
+	# moved from request.py
+	if request.path_parts[0] != IN.APP.config.pfpp:
+		sys_path = route_path_from_alias(path)
+		if sys_path != path:
+			request.path_alias = path
+			request.path_parts = sys_path.split('/')
+			request.path = sys_path
+			path = sys_path
+			
 	token_path, token_values = path_to_token_path(path)
 	
-	context.request.path_tokenized = token_path
-	context.request.path_tokenized_values = token_values
+	request.path_tokenized = token_path
+	request.path_tokenized_values = token_values
 	
-
+	
 	# use In defined action
 	
 	action_def = find_path_in_action_dict(token_path)

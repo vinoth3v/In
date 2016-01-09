@@ -40,7 +40,7 @@ class Commenter:
 				}
 
 		
-	def get_container_id(self, entity):
+	def get_container_id(self, entity, create = True):
 		'''Returns container id for this Content/Parent entity'''
 		
 		# TODO: cache it
@@ -58,11 +58,13 @@ class Commenter:
 			'order' : {'total_comments' : 'DESC'} # if having duplicates?
 		}).execute()
 
-		if cursor.rowcount == 0:
+		if cursor.rowcount > 0:
+			return cursor.fetchone()['id']
+			
+		if create:
 			container_id = self.create_comment_container(entity)			
 			return container_id
-			
-		return cursor.fetchone()['id']
+		
 		
 	def create_comment_container(self, entity):
 

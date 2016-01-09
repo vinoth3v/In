@@ -21,20 +21,27 @@ def __context_early_action__(context):
 	if not path:
 		return
 
-	public_prefix = config.public_file_path_prefix
-	if not path.startswith(public_prefix + '/'):
-		# not public file path
+	path_parts = context.request.path_parts
+	
+	if len(path_parts) < 3:
 		return
-
+	
+	public_prefix = config.public_file_path_prefix
+	
+	if not path_parts[0] == public_prefix:
+		# not files path
+		return
+	
+	part_2 = path_parts[1]
+	
 	for action_path, action_def in IN.APP.file_actions.items():
 		apath = action_path
 		action_path = action_path + '/'
 		
-		if path.startswith(action_path):
-			path = path.replace(action_path, '', 1)
+		if action_def['handler_arguments']['path_type'] == part_2:
+		
+			action_def['handler_arguments']['path'] = path.replace(action_path, '', 1)
 			
-			action_def['handler_arguments']['path'] = path
-			action_def['handler_arguments']['path_type'] = apath.replace(public_prefix + '/', '', 1)
 			action_object = ActionObject(**action_def)
 
 			return action_object
@@ -46,7 +53,9 @@ def actions():
 	actns = {}
 
 	fpaths = IN.hook_invoke('public_file_paths')
-
+	
+	public_file_path_prefix = IN.APP.config.public_file_path_prefix
+	
 	for pathres in fpaths:
 		for path, args in pathres.items():
 			try:
@@ -54,12 +63,13 @@ def actions():
 			except KeyError:
 				handler = file_action_default_handler
 
-			actns['/'.join((IN.APP.config.public_file_path_prefix, path))] = {
+			actns['/'.join((public_file_path_prefix, path))] = {
 				'title' : 'IN File Handler',
 				'handler' : handler,
 				'type' : 'hidden', # | link | button | hidden | menu
 				'handler_arguments' : {
 					'base_path' : args['base_path'],
+					'path_type' : path,
 				},
 			}
 

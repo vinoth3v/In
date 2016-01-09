@@ -81,8 +81,6 @@ class Mailer:
 		# theme the mail obj and set body
 		body_text = themer.theme(emailobj, view_mode = 'text')
 		
-		print(111111111111111111111111111, body_text)
-		
 		#message.set_content(body_text)
 		
 		text_part = MIMEText(body_text, 'plain')
@@ -91,12 +89,9 @@ class Mailer:
 		# default view mode is html
 		body_html = themer.theme(emailobj)
 		
-		print(22222222222222222222222222222, body_html)
-		
 		#message.add_alternative(body_html)
 		
 		html_part = MIMEText(body_html, 'html')
-		
 		
 		message.attach(text_part)
 		message.attach(html_part)

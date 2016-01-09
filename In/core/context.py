@@ -101,11 +101,22 @@ class ContextPool(greenlet.greenlet):
 		try:
 			# add db connection as free
 			IN.db.free(context)
-			
+		except Exception:
+			IN.logger.debug()
+		
+		try:
 			del self.pool[context_id]
 		except Exception:
 			IN.logger.debug()
-			
+		
+		context.__free__()
+		
+		try:
+			context.kill() # force greenlet kill
+		except Exception:
+			pass
+		
+		
 		try:
 			del context
 		except Exception:
@@ -173,7 +184,7 @@ class Context(greenlet.greenlet): # , asyncio.Task
 		self.page_title = ''
 		self.display_title = True
 
-		self.headers= wsgiref.headers.Headers([])
+		self.headers = wsgiref.headers.Headers([])
 		self.cookie = Cookie()
 
 		# additional args for this context
@@ -213,7 +224,7 @@ class Context(greenlet.greenlet): # , asyncio.Task
 		self.__not_recursive_hooks__ = []
 
 		# TODO
-		self.__In_static__ = {} # context static value container
+		#self.__In_static__ = {} # context static value container
 
 		# init the request
 
@@ -244,7 +255,12 @@ class Context(greenlet.greenlet): # , asyncio.Task
 			nabar = In.nabar.anonymous()
 
 		self.nabar = nabar
-
+		
+		try: # context may not available
+			self.language = nabar.language
+		except AttributeError:
+			self.language = APP.config.language
+		
 		# init the response
 
 		#IN.hook_invoke('__context_response_init__', self, self.request)
@@ -544,3 +560,15 @@ class Context(greenlet.greenlet): # , asyncio.Task
 		#IN.__context__ = self
 		#super().switch() # greenlet.greenlet
 	
+	def __free__(self):
+		'''freeup resources'''
+		
+		del self.request
+		del self.response
+		del self.environ
+		del self.nabar
+		del self.static_cache
+		del self.asset
+		del self.args
+		
+		

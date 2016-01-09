@@ -9,12 +9,14 @@ from http.cookies import CookieError
 class Request:
 
 	def __init__(self, context):
-
-		self.referrer = context.environ.get('HTTP_REFERER', None)
+		
+		environ = context.environ
+		
+		self.referrer = environ.get('HTTP_REFERER', None)
 		
 		self.referrer_parsed = None
 		
-		self.path = context.environ.get('PATH_INFO', '')
+		self.path = environ.get('PATH_INFO', '')
 		
 		# unicode from latin-1
 		try:
@@ -30,38 +32,62 @@ class Request:
 		# get assign system path
 		self.path_parts = self.path.split('/')
 		
+		self.method = environ.get('REQUEST_METHOD', 'GET').upper()
 		
+		
+		#if len(self.path_parts) > IN.APP.config.max_request_path_parts:
+			#context.bad_request()
+		
+		# moved to action
 		# set original path from path alias
-		if self.path and self.path_parts[0] != IN.APP.config.pfpp:
-			path = In.core.action.route_path_from_alias(self.path)
-			if path != self.path:
-				self.path_parts = path.split('/')
-				self.path = path
+		#if self.path and self.path_parts[0] != IN.APP.config.pfpp:
+			#path = In.core.action.route_path_from_alias(self.path)
+			#if path != self.path:
+				#self.path_parts = path.split('/')
+				#self.path = path
 		
 		self.path_tokenized = self.path
 		self.path_tokenized_values = {}
 		
 		self.__path_hook_tokens__ = None
 		
+		# for property args
+		self.args_parsed = False		
+		self.__args__ = None
 		
-		self.method = context.environ.get('REQUEST_METHOD', 'GET').upper()
-
-		self.args = {
-			'query' : {},
-			'post'  : {},
-		}
-
-		query = self.args['query']
-		post = self.args['post']
-
-		self.__args__ = []
+		self.ajax_parsed = False
+		self.__ajax__ = False
+		
 		self.output_format = 'html' # default
 
 		# if context.environ['REQUEST_METHOD'] == 'GET': # always query values available
 		
-		if 'QUERY_STRING' in context.environ:
+		self.init_cookie(environ.get('HTTP_COOKIE', ''))
+		
+		#pprint(context.environ)
+		
+	
+	@property
+	def args(self):
+		
+		if self.args_parsed:
+			return self.__args__
+		
+		self.__args__ = {
+			'query' : {},
+			'post'  : {},
+		}
+		
+		query = self.__args__['query']
+		post = self.__args__['post']
+		
+		context = IN.context
+		
+		environ = context.environ
+		
+		if 'QUERY_STRING' in environ:
 			
-			query_vars = urllib.parse.parse_qs(context.environ['QUERY_STRING'])
+			query_vars = urllib.parse.parse_qs(environ['QUERY_STRING'])
 			
 			for key in query_vars:
 				data = query_vars[key]
@@ -74,13 +100,13 @@ class Request:
 				else:
 					lpost[lkey] = data
 
-		if self.method == 'POST' and 'wsgi.input' in context.environ:
+		if self.method == 'POST' and 'wsgi.input' in environ:
 			'''Process the file/form uploads.
 
 			GET form submits are not supported now. you can handle that with your custom action.
 			'''
 
-			post_data = cgi.FieldStorage(fp = context.environ['wsgi.input'], environ = context.environ, keep_blank_values = True )
+			post_data = cgi.FieldStorage(fp = environ['wsgi.input'], environ = environ, keep_blank_values = True )
 			
 			#pprint(post_data)
 			
@@ -110,13 +136,13 @@ class Request:
 				except Exception:
 					post['ajax_args'] = {} # must be dict
 					IN.logger.debug()
-					
-			
-		self.init_cookie(context.environ.get('HTTP_COOKIE', ''))
 		
-		#pprint(context.environ)
-		pprint('PPPOOSSSSSSST', self.args)
-	
+		self.args_parsed = True
+		
+		pprint('PPPOOSSSSSSST', self.__args__)
+		
+		return self.__args__
+		
 	def init_cookie(self, cookie = None):
 		# load the cookie
 		try:
@@ -152,17 +178,27 @@ class Request:
 
 	@property
 	def ip(self):
+		environ = IN.context.environ
 		try:
-			return IN.context.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
+			return environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
 		except Exception:
-			return IN.context.environ['REMOTE_ADDR']
+			return environ['REMOTE_ADDR']
 
 	@property
 	def ajax(self):
+		
+		if self.ajax_parsed:
+			return self.__ajax__
+		
 		if 'HTTP_X_REQUESTED_WITH' in IN.context.environ:
-			return IN.context.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'
-		return 'ajax' in self.args['query']
-
+			self.__ajax__ = IN.context.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'
+		else:
+			self.__ajax__ = 'ajax' in self.args['query']
+		
+		self.ajax_parsed = True
+		
+		return self.__ajax__
+		
 	@property
 	def ajax_lazy(self):
 		return self.ajax and 'lazy_load' in self.args['post']

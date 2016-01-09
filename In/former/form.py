@@ -1,6 +1,8 @@
 
 class Form(HTMLObject):
-
+	
+	__always_add_id_attribute__ = True
+	
 	def __init__(self, data = None, items = None, post = None, **args):
 
 		self.has_errors = self.submitted, self.prepared, self.processed = False, False, False

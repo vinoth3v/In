@@ -4,13 +4,17 @@ import datetime
 
 class HTMLObject(Object):
 
-	__always_add_id_attribute__ = True
+	__always_add_id_attribute__ = False
 
 	def get_attributes(self):
 		super().get_attributes()
-		if self.__always_add_id_attribute__ and 'id' not in self.attributes:
-			self.attributes['id'] = self.id
-
+		
+		if 'id' not in self.attributes:
+			if self.__always_add_id_attribute__:
+				self.attributes['id'] = self.id
+			elif not self.__id_auto_generated__:
+				self.attributes['id'] = self.id
+			
 		return self.attributes
 
 builtins.HTMLObject = HTMLObject
@@ -139,7 +143,9 @@ class Link(HTMLObject):
 
 
 class HTMLField(HTMLObject):
-
+	
+	__always_add_id_attribute__ = True
+	
 	def __init__(self, data = None, items = None, **args):
 
 		if data is None:

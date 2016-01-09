@@ -87,7 +87,7 @@ class INThemeEngine:
 
 		'''
 		
-		if not obj:
+		if not obj or not obj.visible:
 			return ''
 		
 		if args is None:
@@ -95,20 +95,26 @@ class INThemeEngine:
 
 		args['__theme_engine__'] = self
 		
-		if not obj.visible:
-			return ''
-			
-		args['context'] = args.get('context', IN.context)
-
-		#if isinstance(obj, Object):
-
+		if 'context' not in args:
+			args['context'] = IN.context
 		
+		#if isinstance(obj, Object):
 		
 		obj_themer = obj.Themer
 		
 		# some themer may change view_mode
 		if obj_themer.__invoke_theme_format_view_mode_alter__:
 			format, view_mode = obj_themer.__theme_format_view_mode_alter__(format, view_mode, args)
+		
+		
+		theme_cacher = obj.ThemeCacher
+		
+		if theme_cacher.theme_cache_enabled:
+			cached_result = theme_cacher.get(obj, format, view_mode, args)
+			
+			if cached_result:
+				cached_result = theme_cacher.process_cached_output(obj, cached_result, format, view_mode, args)
+				return cached_result
 		
 		# TODO: it always raise error first time for all objects
 		#try:
@@ -140,9 +146,10 @@ class INThemeEngine:
 
 		# create theme_output variables
 		self.theme_object_prepare(obj, format, view_mode, args)
-
+		
+		cache_already_set = False
+		
 		if not obj.theme_current_output['themed']: # already themed
-			
 			
 			obj_themer.theme_prepare(obj, format, view_mode, args)
 			if invoke_hook:
@@ -189,13 +196,23 @@ class INThemeEngine:
 			
 			# theme completed
 			obj.theme_current_output['themed'] = True
-
+			
+		else:
+			cache_already_set = True
+			
 		try:
 			theme_output = obj.theme_current_output['output']['final']
 		except KeyError as e:
 			IN.logger.debug()
 			theme_output = ''
-
+		
+		# theme cache set
+		if theme_output and theme_cacher.theme_cache_enabled and not cache_already_set:
+			try:
+				theme_cacher.set(obj, theme_output, format, view_mode, args)
+			except Exception as e:
+				IN.logger.debug()
+		
 		try:
 			del args['__tpl_item_type__']
 		except KeyError as e:

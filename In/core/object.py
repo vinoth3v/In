@@ -29,7 +29,9 @@ class Object(ObjectBase):
 	title = ''
 	visible    = True
 	weight = None
-
+	
+	__id_auto_generated__ = False
+	
 	# theme specific, per instance
 	default_children_view_mode = None
 
@@ -40,6 +42,7 @@ class Object(ObjectBase):
 
 		if 'id' not in data:
 			data['id'] = '_'.join((self.__type__, str(id(self))))
+			self.__id_auto_generated__ = True
 
 		if 'name' not in data:
 			data['name'] = str(data['id'])
