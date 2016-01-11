@@ -126,5 +126,5 @@ class EntityThemeCacher(ObjectThemeCacher):
 	''''''
 	
 	# TODO: allow in config
-	theme_cache_enabled = True # default
+	theme_cache_enabled = False # default
 	

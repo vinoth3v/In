@@ -128,19 +128,18 @@ class INHooker:
 		if __inc_result__: # if __inc_result__ supplied the current result wil be available to hooks on __result__ variable.
 			kargs['__result__'] = result
 
-		#whether the result includes the module name?
-
+		self___function_invoke__ = self.__function_invoke__
+		
+		# whether the result includes the module name?		
 		if __inc_module__:
-			return [{fun.__module__ : self.__function_invoke__(fun, args, kargs, __error_handler__)} for fun in funs_to_call]
+			return [{fun.__module__ : self___function_invoke__(fun, args, kargs, __error_handler__)} for fun in funs_to_call]
 		else:
-			return [self.__function_invoke__(fun, args, kargs, __error_handler__) for fun in funs_to_call]
+			return [self___function_invoke__(fun, args, kargs, __error_handler__) for fun in funs_to_call]
 			#result = list(map((lambda fun: self.__function_invoke__(fun, args, kargs, __error_handler__)), funs_to_call))
-			return result
+			#return result
 
 		# remove hook.
 		#IN.context.__hooks_in_action__.remove(hook)
-
-		# IN.add_debug('invoke : ' + n + '.' + hook)
 
 	def hook_invoke_yield(self, hook, *args, __max_hooks__ = None, __inc_result__ = None, __error_handler__ = None, __inc_module__ = None, **kargs):
 		'''Invoke all the hook methods which are registered for the hook 'hook' and yield the results one by one so you can stop at where you want.
@@ -173,18 +172,22 @@ class INHooker:
 			funs_to_call = hooks[:__max_hooks__]
 		else:
 			funs_to_call = hooks
-
-		if __inc_result__: # if __inc_result__ supplied the current result wil be available to hooks on __result__ variable.
+		
+		# if __inc_result__ supplied the current result wil be available to hooks on __result__ variable.
+		# so that, next hook implementation can use that
+		if __inc_result__: 
 			kargs['__result__'] = result
 
-		#whether the result includes the module name?
-
+		self___function_invoke__ = self.__function_invoke__
+		
+		# whether the result includes the module name?
+		
 		if __inc_module__:
 			for fun in funs_to_call:
-				yield {fun.__module__ : self.__function_invoke__(fun, args, kargs, __error_handler__)}
+				yield {fun.__module__ : self___function_invoke__(fun, args, kargs, __error_handler__)}
 		else:
 			for fun in funs_to_call:
-				yield self.__function_invoke__(fun, args, kargs, __error_handler__)
+				yield self___function_invoke__(fun, args, kargs, __error_handler__)
 
 
 	def __function_invoke__(self, fun, args, kargs, __error_handler__ = None):

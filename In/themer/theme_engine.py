@@ -106,7 +106,7 @@ class INThemeEngine:
 		if obj_themer.__invoke_theme_format_view_mode_alter__:
 			format, view_mode = obj_themer.__theme_format_view_mode_alter__(format, view_mode, args)
 		
-		
+		# static theme output cache
 		theme_cacher = obj.ThemeCacher
 		
 		if theme_cacher.theme_cache_enabled:
@@ -151,49 +151,58 @@ class INThemeEngine:
 		
 		if not obj.theme_current_output['themed']: # already themed
 			
-			obj_themer.theme_prepare(obj, format, view_mode, args)
 			if invoke_hook:
+				
+				obj_themer.theme_prepare(obj, format, view_mode, args)
 				hook_invoke('_'.join((prefix, 'prepare')), obj, format, view_mode, args)
 
-			if invoke_hook:
 				hook_invoke('_'.join((prefix, 'pre')), obj, format, view_mode, args)
-			
-			obj_themer.theme(obj, format, view_mode, args)
-			if invoke_hook:
-				hook_invoke(prefix, obj, format, view_mode, args)
-			
-			# after theme call object may set it invisible depends on empty values
-			if not obj.visible:
-				return ''
-			
-			#obj_themer.theme_items_pre(obj, format, view_mode, args)
-			#if hook_invoke:
-				#hook_invoke('_'.join((prefix, 'theme_items_pre')), obj, format, view_mode, args)
-
-			obj_themer.theme_items(obj, format, view_mode, args)
-			if invoke_hook:
-				hook_invoke('_'.join((prefix, 'theme_items')), obj, format, view_mode, args)
 				
-			obj_themer.theme_attributes(obj, format, view_mode, args)
-			if invoke_hook:
+				obj_themer.theme(obj, format, view_mode, args)
+				hook_invoke(prefix, obj, format, view_mode, args)
+				
+				# after theme call object may set it invisible depends on empty values
+				if not obj.visible:
+					return ''
+				
+				obj_themer.theme_items(obj, format, view_mode, args)
+				hook_invoke('_'.join((prefix, 'theme_items')), obj, format, view_mode, args)
+					
+				obj_themer.theme_attributes(obj, format, view_mode, args)
 				hook_invoke('_'.join((prefix, 'theme_attributes')), obj, format, view_mode, args)
-			
-			
-			obj_themer.theme_process_variables(obj, format, view_mode, args)
-			if invoke_hook:
+				
+				
+				obj_themer.theme_process_variables(obj, format, view_mode, args)
 				hook_invoke('_'.join((prefix, 'theme_process_variables')), obj, format, view_mode, args)
-			
-			# call the handler to template it
-			#handler_obj.theme(obj, format, view_mode, args)
-
-			self.theme_object_plateit(obj, format, view_mode, args)
-			
-			
-			#callback for the final touch
-			obj_themer.theme_done(obj, format, view_mode, args)
-			if invoke_hook:
+				
+				self.theme_object_plateit(obj, format, view_mode, args)
+				
+				
+				#callback for the final touch
+				obj_themer.theme_done(obj, format, view_mode, args)
 				hook_invoke('_'.join((prefix, 'theme_done')), obj, format, view_mode, args)
-			
+				
+			else:
+				
+				obj_themer.theme_prepare(obj, format, view_mode, args)
+				
+				obj_themer.theme(obj, format, view_mode, args)
+				
+				# after theme call object may set it invisible depends on empty values
+				if not obj.visible:
+					return ''
+				
+				obj_themer.theme_items(obj, format, view_mode, args)
+					
+				obj_themer.theme_attributes(obj, format, view_mode, args)
+				
+				obj_themer.theme_process_variables(obj, format, view_mode, args)
+				
+				self.theme_object_plateit(obj, format, view_mode, args)
+				
+				#callback for the final touch
+				obj_themer.theme_done(obj, format, view_mode, args)
+				
 			# theme completed
 			obj.theme_current_output['themed'] = True
 			
@@ -327,7 +336,7 @@ class INThemeEngine:
 		
 		return theme_module
 
-	def theme_def_path(self, format=__default_format__):
+	def theme_def_path(self, format = __default_format__):
 		if not format:
 			return ''
 
@@ -408,28 +417,42 @@ class INThemeEngine:
 		#except AttributeError as e:
 			#pass
 
-		def_view_mode_dict = {
-			'themed': False, 		# not themed yet
-			'content' : {			# USED BY Templates, theme functions
-				'children' : OrderedDict(),	# keep order
-			},
-			'output' : {
-				'children' : '', 			# optional children merged output
-				'final_output'	: '', 		# final output
-			}
-		}
-		if obj.theme_output is None:
+		if obj.theme_output is None or args.get('retheme', False):
 			obj.theme_output = {
 				format : {
-					view_mode : def_view_mode_dict
+					view_mode : {
+						'themed': False, 		# not themed yet
+						'content' : {			# USED BY Templates, theme functions
+							'children' : OrderedDict(),	# keep order
+						},
+						'output' : {
+							'children' : '', 			# optional children merged output
+							'final_output'	: '', 		# final output
+						}
+					}
+				}
+			}
+			
+			obj.theme_current_output = obj.theme_output[format][view_mode]
+			
+			return
+		
+		obj_theme_output_format = obj.theme_output[format]
+		
+		if view_mode not in obj_theme_output_format:
+			obj_theme_output_format[view_mode] = {
+				'themed': False, 		# not themed yet
+				'content' : {			# USED BY Templates, theme functions
+					'children' : OrderedDict(),	# keep order
+				},
+				'output' : {
+					'children' : '', 			# optional children merged output
+					'final_output'	: '', 		# final output
 				}
 			}
 		
-		if view_mode not in obj.theme_output[format]:
-			obj.theme_output[format][view_mode] = def_view_mode_dict
-		
 		# short cut attribute, we can use this if we dont know which format which view_mode
-		obj.theme_current_output = obj.theme_output[format][view_mode]
+		obj.theme_current_output = obj_theme_output_format[view_mode]
 
 		#'''
 		#obj.theme_output = {
@@ -448,9 +471,6 @@ class INThemeEngine:
 			#}
 		#}
 		#'''
-
-		if args.get('retheme', False): # retheme
-			obj.theme_current_output = def_view_mode_dict
 
 		#print('Themer....... ', obj, obj.Themer)
 

@@ -27,7 +27,7 @@ class AccountAuth:
 		# moved to core.access
 		#self.build_access_roles()
 		
-		#self.cached_method = lru_cache(maxsize=16)(self.cached_method)
+		self.__simple_hash__ = lru_cache(maxsize = 9999)(self.__simple_hash__)
 		
 	def build_access_roles(self):
 		
@@ -208,9 +208,11 @@ class AccountAuth:
 				return int(uid)
 		
 		# not valid
-		context.cookie.clear('UID')
-		context.cookie.clear('HASH')
-		context.cookie.clear('RHASH')
+		clear = context.cookie.clear
+		
+		clear('UID')
+		clear('HASH')
+		clear('RHASH')
 
 		return False
 
@@ -258,9 +260,7 @@ class AccountAuth:
 		clear('RHASH')
 
 		context.nabar = self.anonymous()
-
-		context.redirect(IN.APP.config.logout_path)
-
+	
 	def __simple_hash__(self, key):
 		h = 5
 		for i in key:

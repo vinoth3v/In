@@ -63,7 +63,9 @@ class ObjectThemer(ObjectThemerBase):
 		
 		wrapper.value = output
 		
-		output = IN.themer.theme(wrapper, format, view_mode)
+		themer = args['__theme_engine__']
+		
+		output = themer.theme(wrapper, format, view_mode)
 
 		obj.theme_current_output['output']['final'] = output
 
@@ -80,27 +82,30 @@ class ObjectThemer(ObjectThemerBase):
 		_theme = IN.themer.theme
 		
 		if self.sort_children:
-			si = sorted(obj.values(), key = lambda obj: int(obj.weight))
+			si = sorted(obj.values(), key = lambda obj: obj.weight) # int
 		else:
 			si = obj.values()
+		
+		sub_view_mode = obj.default_children_view_mode or view_mode
+		context = args['context']
 		
 		for child in si: #obj.items():
 			try:
 				#idx += 1
-				weight = child.weight #or idx
+				#weight = child.weight #or idx
 				
-				subargs = {
-					'context'	: args['context'],
-					'item_index' : weight,
-				}
+				#subargs = {
+					#'context' : context,
+					##'item_index' : weight,
+				#}
 				
-				sub_view_mode = obj.default_children_view_mode or view_mode
-				
-				child_theme_output = _theme(child, format, sub_view_mode, subargs)
+				#child_theme_output = _theme(child, format, sub_view_mode, subargs)
 
 				children[child.id] = {
-					'content' : child_theme_output,
-					'weight' : weight, # keep order
+					'content' : _theme(child, format, sub_view_mode, {
+						'context' : context
+					}),
+					'weight' : child.weight, # keep order
 				}
 				
 			except Exception as e:
@@ -156,27 +161,12 @@ class ObjectThemer(ObjectThemerBase):
 		theme_output['content']['attributes'] = theme_attrbs
 
 
-	def theme_css(self, obj, item_index=0, ref=2):
-		classes = ''
+	def theme_css(self, obj):
 
-		# remove unwanted classes
-		#obj.css.append(obj.id)
-
-		#TODO: dynamic switch
-		#add_oject_type_to_class = True
-		#if add_oject_type_to_class:
-		#	obj.css.append( obj.type )
-
-		if item_index > 0 and ref > 0:
-			#obj.css.append( '-'.join(obj.__type__, str(item_index)) )
-			obj.css.append( ''.join('i-', str(item_index%ref)) )
-
-		#obj.css.append( ' '.join(obj.status) )
-
-		if obj.css:
-			classes = ' '.join(obj.css)
-
-		return classes
+		if not obj.css:
+			return ''
+		
+		return ' '.join(obj.css)
 
 	def theme_process_variables(self, obj, format, view_mode, args):
 
@@ -191,7 +181,6 @@ class ObjectThemer(ObjectThemerBase):
 		children = theme_output['content']['children']
 		for obj_id, obj_content in children.items():
 			args[obj_id] = obj_content['content']
-			
 			
 		if self.merge_children:
 			

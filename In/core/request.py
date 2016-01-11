@@ -58,6 +58,10 @@ class Request:
 		self.ajax_parsed = False
 		self.__ajax__ = False
 		
+		self.ajax_args_parsed = False
+		self.__ajax_args__ = None
+		
+		
 		self.output_format = 'html' # default
 
 		# if context.environ['REQUEST_METHOD'] == 'GET': # always query values available
@@ -139,7 +143,7 @@ class Request:
 		
 		self.args_parsed = True
 		
-		pprint('PPPOOSSSSSSST', self.__args__)
+		#pprint('PPPOOSSSSSSST', self.__args__)
 		
 		return self.__args__
 		
@@ -206,7 +210,14 @@ class Request:
 	@property
 	def ajax_args(self):
 		# form has post, a args may be in query
-		return self.args['post'].get('ajax_args', None) or self.args['query'].get('ajax_args', {})
+		if self.ajax_args_parsed:
+			self.__ajax_args__
+		
+		self.__ajax_args__ = self.args['post'].get('ajax_args', None) or self.args['query'].get('ajax_args', {})
+		
+		self.ajax_args_parsed = True
+		
+		return self.__ajax_args__
 	
 	
 	@property

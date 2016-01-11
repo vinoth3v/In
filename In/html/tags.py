@@ -9,13 +9,15 @@ class HTMLObject(Object):
 	def get_attributes(self):
 		super().get_attributes()
 		
-		if 'id' not in self.attributes:
+		self_attributes = self.attributes
+		
+		if 'id' not in self_attributes:
 			if self.__always_add_id_attribute__:
-				self.attributes['id'] = self.id
+				self_attributes['id'] = self.id
 			elif not self.__id_auto_generated__:
-				self.attributes['id'] = self.id
+				self_attributes['id'] = self.id
 			
-		return self.attributes
+		return self_attributes
 
 builtins.HTMLObject = HTMLObject
 

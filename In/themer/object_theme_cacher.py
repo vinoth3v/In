@@ -71,13 +71,11 @@ class ObjectThemeCacher(ObjectThemeCacherBase):
 		
 		context = args.get('context', None) or IN.context
 		
-		language = args.get('language', None) or context.language
-		
-		if not language:
-			language = 'ta'
+		language = args.get('language', None) or context.language or 'ta'
 		
 		theme_name = context.current_theme.__name__
 		
+		# prefixing type, id
 		# we may need to remove entire dir of obj when updating
 		
 		return ':'.join((type, str(id), theme_name, format, view_mode, language, 'cache'))

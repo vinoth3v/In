@@ -134,9 +134,13 @@ class CacheFile(Cacher):
 
 		self.memory_cache = {}
 		
-		self.digest_key = lru_cache(maxsize=9999)(self.digest_key)
+		# per instance, bin based lru cache
+		self.digest_key = lru_cache(maxsize = 9999)(self.digest_key)
 		
-		# TODO: profile save not working
+		# need to restart if you manually delete file cache
+		self.get_file_name = lru_cache(maxsize = 9999)(self.get_file_name)
+		
+		# TODO: clear lru cache on entity update
 		#self.get = lru_cache(maxsize = IN.APP.config.lru_cache_cache_file_max_limit)(self.get)
 		
 
@@ -161,7 +165,7 @@ class CacheFile(Cacher):
 
 	def get_file_name(self, key):
 		key = str(key)
-		this_path = key.replace(':', '/')
+		this_path = key.replace(':', os.sep)
 		
 		#if self.digest:
 			## TODO: digest only the last part?
@@ -170,8 +174,10 @@ class CacheFile(Cacher):
 		full_path = os.path.join(self.base_dir, this_path)
 
 		# create dir if not exists
-		os.makedirs(os.path.dirname(full_path), exist_ok = True)
-
+		dir_name = os.path.dirname(full_path)
+		if not os.path.exists(dir_name):
+			os.makedirs(dir_name, exist_ok = True)
+		
 		return full_path
 
 	def __load__(self, file_name):

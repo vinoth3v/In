@@ -114,238 +114,13 @@ class Select(Query):
 			'order' : [{'id': 'asc'}, 'status']
 		})
 	'''
-
-	def sql(self):
-		'''returns json as select sql'''
-		
-		where_values = {}
-		join_values = {}
-		
-		q = ['SELECT ']
-
-		# COLUMNS
-		if type(self.columns) is str:
-			q.append(self.columns)
-		else:
-
-			if type(self.columns) is list:
-
-				# ['col1', 'col2']
-				q.append(', '.join(col for col in self.columns))
-
-			elif type(self.columns) is dict:
-				# {'tbl' : ['col', 'col']},
-				# {'tbl' : [{'col': 'alias'}, {'col': 'alias'}]},
-				# {'col' : 'alias'},
-				for key, value in self.columns.items():
-					if type(value) is str:
-						# {'key' : 'alias'},
-						q.append(' as '.join((key, value)))
-					if type(value) is list:
-						# {'tbl' : [{'col': 'alias'}, {'col': 'alias'}]},
-						for col_value in value:
-							if type(value) is list:
-								# {'tbl' : ['col', 'col']},
-								q.append(', '.join('.'.join((key, c)) for c in col_value))
-							if type(col_value) is dict:
-								q.append(''.join((key, '.', c, ' as ', a)) for c, a in col_value.items())
-
-
-		q.append(' FROM ')
-
-		# FROM TABLES
-		if type(self.tables) is str:
-			q.append(self.tables)
-		else:
-			tables = []
-			for tbl in self.tables:
-				if type(tbl) is str:
-					tables.append(tbl)
-				else:
-					tables.append(' '.join(tbl))
-			q.append(', '.join(tables))
-		
-		# JOIN
-		if self.join:
-			join_values = {}
-			for join in self.join:
-				q.append(' '.join((' ', join[0], join[1], join[2])))
-				
-				q.append(' ON ')
-				
-				where = join[3]
-				where, join_vals = JoinCondition(where).sql(join_values)
-				
-				#join_values.update(join_vals)
-				q.append(where)
-		
-		# WHERE
-		if self.where:
-			q.append(' WHERE ')
-			where, where_values = Condition(self.where).sql()
-			q.append(where)
-			
-		# GROUP BY
-		if self.group:
-			q.append(' GROUP BY ')
-
-			if type(self.group) is str:
-				q.append(self.group)
-			else:
-
-				if type(self.group) is list:
-
-					# ['col1', 'col2']
-					q.append(', '.join(col for col in self.group))
-
-				elif type(self.group) is dict:
-					# {'tbl' : ['col', 'col']},
-					for key, value in self.group.items():
-						for col_value in value:
-							q.append(', '.join('.'.join((key, c)) for c in col_value))
-
-		# ORDER BY
-		if self.order:
-			q.append(' ORDER BY ')
-
-			if type(self.order) is str:
-				q.append(self.order)
-			else:
-
-				if type(self.order) is list:
-					# ['col1', 'col2']
-					q.append(', '.join(col for col in self.order))
-
-				elif type(self.order) is dict:
-					# {'tbl' : ['col', 'col']},
-					# {'tbl' : [{'col': 'ASC'}, {'col': 'DESC'}]},
-					# {'col' : 'ASC'},
-					for key, value in self.order.items():
-						if type(value) is str:
-							# {'key' : 'ASC'},
-							q.append(' '.join((key, value)))
-						if type(value) is list:
-							# {'tbl' : [{'col': 'ASC'}, {'col': 'ASC'}]},
-							for col_value in value:
-								if type(value) is list:
-									# {'tbl' : ['col', 'col']},
-									q.append(', '.join('.'.join((key, c)) for c in col_value))
-								if type(col_value) is dict:
-									q.append(''.join((key, '.', c, ' ', a)) for c, a in col_value.items())
-
-
-		if self.limit:
-			q.append(' LIMIT ')
-			if type(self.limit) is list:
-				q.append(str(self.limit.pop()))
-				if self.limit:
-					q.append(' OFFSET ')
-					q.append(str(self.limit.pop()))
-				#q.append(','.join(str(i) for i in self.limit))
-			else:
-				q.append(str(self.limit))
-		if join_values is None:
-			join_values = {}
-		if where_values is None:
-			where_values = {}
-		
-		where_values.update(join_values)
-		
-		return ''.join(q), where_values
-
-	def count_sql(self):
-		'''returns count query sql'''
-		
-		where_values = {}
-		join_values = {}
-		
-		q = ['SELECT ']
-		
-		if self.count_column:
-			q.append(self.count_column.join((' count(', ') ')))
-		else:
-			q.append(' count(*) ')
-
-		q.append(' FROM ')
-
-		# FROM TABLES
-		if type(self.tables) is str:
-			q.append(self.tables)
-		else:
-			tables = []
-			for tbl in self.tables:
-				if type(tbl) is str:
-					tables.append(tbl)
-				else:
-					tables.append(' '.join(tbl))
-			q.append(', '.join(tables))
-		
-		# JOIN
-		if self.join:
-			join_values = {}
-			for join in self.join:
-				q.append(' '.join((' ', join[0], join[1], join[2])))
-				
-				q.append(' ON ')
-				
-				where = join[3]
-				
-				where, join_vals = JoinCondition(where).sql(join_values)
-				
-				#join_values.update(join_vals)
-				q.append(where)
-		
-		# WHERE
-		if self.where:
-			q.append(' WHERE ')
-			where, where_values = Condition(self.where).sql()
-			q.append(where)
-
-
-		# GROUP BY
-		if self.group:
-			q.append(' GROUP BY ')
-
-			if type(self.group) is str:
-				q.append(self.group)
-			else:
-
-				if type(self.group) is list:
-
-					# ['col1', 'col2']
-					q.append(', '.join(col for col in self.group))
-
-				elif type(self.group) is dict:
-					# {'tbl' : ['col', 'col']},
-					for key, value in self.group.items():
-						for col_value in value:
-							q.append(', '.join('.'.join((key, c)) for c in col_value))
-
-		#if self.limit:
-			#q.append(' LIMIT ')
-			#if type(self.limit) is list:
-				#q.append(str(self.limit.pop()))
-				#if self.limit:
-					#q.append(' OFFSET ')
-					#q.append(str(self.limit.pop()))
-				##q.append(','.join(str(i) for i in self.limit))
-			#else:
-				#q.append(str(self.limit))
-		if join_values is None:
-			join_values = {}
-		if where_values is None:
-			where_values = {}
-		
-		where_values.update(join_values)
-		
-		return ''.join(q), where_values
-
+	
 	def __init__(self, json, **args):
 
-		self.columns = json.get('columns', ['*'])
-
+		self.columns = json.get('columns', [])
+		
 		self.tables = json.get('tables', None)
-
+		
 		if self.tables is None:
 			self.tables = []
 			
@@ -365,8 +140,271 @@ class Select(Query):
 		# values from where condtions will be added here
 		self.values = {}
 
+	def sql(self):
+		'''returns json as select sql'''
+		
+		where_values = {}
+		join_values = {}
+		
+		q = ['SELECT ']
+
+		q_append = q.append
+		
+		# COLUMNS
+		
+		self_columns = self.columns
+		type_self_columns = type(self_columns)
+		
+		if not self_columns:
+			q_append('*')
+		elif type_self_columns is str:
+			q_append(self_columns)
+		else:
+
+			if type_self_columns is list:
+
+				# ['col1', 'col2']
+				q_append(', '.join(col for col in self_columns))
+
+			elif type_self_columns is dict:
+				# {'tbl' : ['col', 'col']},
+				# {'tbl' : [{'col': 'alias'}, {'col': 'alias'}]},
+				# {'col' : 'alias'},
+				for key, value in self_columns.items():
+					type_value = type(value)
+					if type_value is str:
+						# {'key' : 'alias'},
+						q_append(' as '.join((key, value)))
+					elif type_value is list:
+						# {'tbl' : [{'col': 'alias'}, {'col': 'alias'}]},
+						for col_value in value:
+							type_col_value = type(col_value)
+							if type_col_value is list:
+								# {'tbl' : ['col', 'col']},
+								q_append(', '.join('.'.join((key, c)) for c in col_value))
+							elif type_col_value is dict:
+								q_append(''.join((key, '.', c, ' as ', a)) for c, a in col_value.items())
+
+
+		q_append(' FROM ')
+
+		# FROM TABLES
+		
+		self_tables = self.tables
+		
+		if type(self_tables) is str:
+			q_append(self_tables)
+		else:
+			tables = []
+			for tbl in self_tables:
+				if type(tbl) is str:
+					tables.append(tbl)
+				else:
+					tables.append(' '.join(tbl))
+			q_append(', '.join(tables))
+		
+		# JOIN
+		self_join = self.join
+		
+		if self_join:
+			join_values = {}
+			for join in self_join:
+				q_append(' '.join((' ', join[0], join[1], join[2])))
+				
+				q_append(' ON ')
+				
+				where = join[3]
+				where, join_vals = JoinCondition(where).sql(join_values)
+				
+				#join_values.update(join_vals)
+				q_append(where)
+		
+		# WHERE
+		
+		self_where = self.where
+		
+		if self_where:
+			q_append(' WHERE ')
+			where, where_values = Condition(self_where).sql()
+			q_append(where)
+			
+		# GROUP BY
+		
+		self_group = self.group
+		type_self_group = type(self_group)
+		
+		if self_group:
+			q_append(' GROUP BY ')
+
+			if type_self_group is str:
+				q_append(self_group)
+			else:
+
+				if type_self_group is list:
+
+					# ['col1', 'col2']
+					q_append(', '.join(col for col in self_group))
+
+				elif type_self_group is dict:
+					# {'tbl' : ['col', 'col']},
+					for key, value in self_group.items():
+						for col_value in value:
+							q_append(', '.join('.'.join((key, c)) for c in col_value))
+
+		# ORDER BY
+		
+		self_order = self.order
+		type_self_order = type(self_order)
+		
+		if self_order:
+			q_append(' ORDER BY ')
+
+			if type_self_order is str:
+				q_append(self_order)
+			else:
+				
+				if type_self_order is list:
+					# ['col1', 'col2']
+					q_append(', '.join(col for col in self_order))
+
+				elif type_self_order is dict:
+					# {'tbl' : ['col', 'col']},
+					# {'tbl' : [{'col': 'ASC'}, {'col': 'DESC'}]},
+					# {'col' : 'ASC'},
+					for key, value in self_order.items():
+						if type(value) is str:
+							# {'key' : 'ASC'},
+							q_append(' '.join((key, value)))
+						if type(value) is list:
+							# {'tbl' : [{'col': 'ASC'}, {'col': 'ASC'}]},
+							for col_value in value:
+								if type(value) is list:
+									# {'tbl' : ['col', 'col']},
+									q_append(', '.join('.'.join((key, c)) for c in col_value))
+								if type(col_value) is dict:
+									q_append(''.join((key, '.', c, ' ', a)) for c, a in col_value.items())
+
+		# LIMIT
+		
+		self_limit = self.limit
+		if self_limit:
+			q_append(' LIMIT ')
+			if type(self_limit) is list:
+				q_append(str(self_limit.pop()))
+				if self_limit:
+					q_append(' OFFSET ')
+					q_append(str(self_limit.pop()))
+				#q.append(','.join(str(i) for i in self.limit))
+			else:
+				q_append(str(self_limit))
+				
+		if join_values is None:
+			join_values = {}
+		if where_values is None:
+			where_values = {}
+		
+		if join_values:
+			where_values.update(join_values)
+		
+		return ''.join(q), where_values
+
+	def count_sql(self):
+		'''returns count query sql'''
+		
+		where_values = {}
+		join_values = {}
+		
+		q = ['SELECT ']
+		
+		q_append = q.append
+		
+		if self.count_column:
+			q_append(self.count_column.join((' count(', ') ')))
+		else:
+			q_append(' count(*) ')
+
+		q_append(' FROM ')
+
+		# FROM TABLES
+		
+		self_tables = self.tables
+		
+		if type(self_tables) is str:
+			q_append(self_tables)
+		else:
+			tables = []
+			for tbl in self_tables:
+				if type(tbl) is str:
+					tables.append(tbl)
+				else:
+					tables.append(' '.join(tbl))
+			q_append(', '.join(tables))
+			
+		
+		# JOIN
+		self_join = self.join
+		
+		if self_join:
+			join_values = {}
+			for join in self_join:
+				q_append(' '.join((' ', join[0], join[1], join[2])))
+				
+				q_append(' ON ')
+				
+				where = join[3]
+				where, join_vals = JoinCondition(where).sql(join_values)
+				
+				#join_values.update(join_vals)
+				q_append(where)
+		
+		
+		# WHERE
+		
+		self_where = self.where
+		
+		if self_where:
+			q_append(' WHERE ')
+			where, where_values = Condition(self_where).sql()
+			q_append(where)
+			
+
+		# GROUP BY
+		
+		self_group = self.group
+		type_self_group = type(self_group)
+		
+		if self_group:
+			q_append(' GROUP BY ')
+
+			if type_self_group is str:
+				q_append(self_group)
+			else:
+
+				if type_self_group is list:
+
+					# ['col1', 'col2']
+					q_append(', '.join(col for col in self_group))
+
+				elif type_self_group is dict:
+					# {'tbl' : ['col', 'col']},
+					for key, value in self_group.items():
+						for col_value in value:
+							q_append(', '.join('.'.join((key, c)) for c in col_value))
+
+		if join_values is None:
+			join_values = {}
+		if where_values is None:
+			where_values = {}
+		
+		if join_values:
+			where_values.update(join_values)
+		
+		return ''.join(q), where_values
+
+
 	def execute(self):
 		'''shotcut method'''
+		
 		q, where_values = self.sql()
 		
 		return IN.db.execute(q, where_values)
@@ -398,20 +436,24 @@ class Insert(Query):
 	def sql(self, values):
 		'''returns json as insert sql'''
 		q = ['INSERT INTO ']
-		q.append(self.table)
+		
+		q_append = q.append
+		self_columns = self.columns
+		
+		q_append(self.table)
 
-		q.append(', '.join(col for col in self.columns).join((' (', ') ')))
+		q_append(', '.join(col for col in self_columns).join((' (', ') ')))
 
-		q.append(' VALUES ')
+		q_append(' VALUES ')
 
-		vstr = ', '.join('%s' for col in range(len(self.columns))).join(('(', ')'))
+		vstr = ', '.join('%s' for col in range(len(self_columns))).join(('(', ')'))
 		vstr = ', '.join(vstr for i in range(len(values)))
 		
-		q.append(vstr)
+		q_append(vstr)
 		
 		if self.returning:
-			q.append(' returning ')
-			q.append(self.returning)
+			q_append(' returning ')
+			q_append(self.returning)
 
 		return ''.join(q)
 
@@ -449,16 +491,19 @@ class InsertDict(Query):
 	def sql(self):
 		'''returns json as insert sql'''
 
-		sql = ['INSERT INTO ']
-		sql.append(self.table)
-		sql.append(', '.join(col for col in self.columns).join(' (', ') '))
-		sql.append(' VALUES ')
-		sql.append(', '.join(col.join('%(', ')s') for col in self.columns).join(' (', ') '))
+		q = ['INSERT INTO ']
+		q_append = q.append
+		self_columns = self.columns
+		
+		q_append(self.table)
+		q_append(', '.join(col for col in self_columns).join(' (', ') '))
+		q_append(' VALUES ')
+		q_append(', '.join(col.join('%(', ')s') for col in self_columns).join(' (', ') '))
 		if self.returning:
-			sql.append(' returning ')
-			sql.append(self.returning)
+			q_append(' returning ')
+			q_append(self.returning)
 
-		return ''.join(sql)
+		return ''.join(q)
 
 	def execute(self, values = None):
 		'''shotcut method'''
@@ -485,13 +530,15 @@ class Delete(Query):
 		'''returns json as insert sql'''
 
 		q = ['DELETE FROM ']
-		q.append(self.table)
-
+		q_append = q.append
+		
+		q_append(self.table)
+		
 		where_values = []
 		if self.where:
-			q.append(' WHERE ')
+			q_append(' WHERE ')
 			where, where_values = Condition(self.where).sql()
-			q.append(where)
+			q_append(where)
 			
 		return ''.join(q), where_values
 
@@ -521,20 +568,22 @@ class Update(Query):
 		'''returns json as insert sql'''
 
 		q = ['UPDATE ']
-		q.append(self.table)
-
+		q_append = q.append
+		
+		q_append(self.table)
+		
 		values = {}
 
 		if self.values:
-			q.append(' SET ')
+			q_append(' SET ')
 			set, set_values = ValueSet(self.set).sql()
-			q.append(set)
+			q_append(set)
 			values.update(set_values)
 			
 		if self.where:
-			q.append(' WHERE ')
+			q_append(' WHERE ')
 			where, where_values = Condition(self.where).sql()
-			q.append(where)
+			q_append(where)
 			values.update(where_values)
 			
 		return ''.join(q), values
@@ -582,17 +631,21 @@ class Condition:
 				return where[0], where_values
 
 		if length == 2:
-			if type(where[0]) is str:
-				if where[0].lower() == 'or':
-					return self.__class__(self.where[1]).sql(where_values, ' OR ')
-				elif where[0].lower() == 'and':
-					return self.__class__(self.where[1]).sql(where_values, ' AND ')
+			where_0 = where[0]
+			
+			if type(where_0) is str:				
+				where_0_lower = where_0.lower()
+				
+				if where_0_lower == 'or':
+					return self.__class__(where[1]).sql(where_values, ' OR ')
+				elif where_0_lower == 'and':
+					return self.__class__(where[1]).sql(where_values, ' AND ')
 				else:
 					# ['status', 0]
 					_len = len(where_values) + 1
 					param_key = self.param_prefix + str(_len)
 					where_values[param_key] = where[1]
-					return ''.join((where[0], ' = ', '%(', param_key, ')s')), where_values
+					return ''.join((where_0, ' = ', '%(', param_key, ')s')), where_values
 
 		if length == 3:
 			col = where[0]
@@ -613,10 +666,11 @@ class Condition:
 
 
 		q = []
-
+		q_append = q.append
 		for where in self.where:
 			subq, where_values = self.__class__(where).sql(where_values, andor)
-			q.append(subq.join(('(', ')')))
+			q_append(subq.join(('(', ')')))
+		
 		q = andor.join(q)
 		return q, where_values
 
@@ -640,10 +694,12 @@ class ValueSet:
 
 		set_values = {}
 		cols = []
+		cols_append = cols.append
+		
 		for col_val in self.set:
 			_len = len(set_values) + 1
 			param_key = self.param_prefix + str(_len) # __, it should not be conflit with where values
 			set_values[param_key] = col_val[1]
-			cols.append(''.join((col_val[0], ' = ', '%(', param_key, ')s')))
+			cols_append(''.join((col_val[0], ' = ', '%(', param_key, ')s')))
 
 		return ', '.join(cols), set_values

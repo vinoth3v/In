@@ -1,4 +1,6 @@
 
+#TODO: same name as entity type File
+# fix: themer register
 @IN.register('File', type = 'image')
 class FileImage(File):
 	'''FileImage bundle class.
@@ -27,9 +29,9 @@ class FileImageThemer(In.file.FileThemer):
 			view_mode = 'default'
 		
 		if obj.private:
-			path = ''.join((cdn, '/files/private/style/', view_mode, '/', obj.path))
+			path = ''.join(('//', cdn, '/files/private/style/', view_mode, '/', obj.path))
 		else:
-			path = ''.join((cdn, '/files/public/style/', view_mode, '/', obj.path))
+			path = ''.join(('//', cdn, '/files/public/style/', view_mode, '/', obj.path))
 	
 		# TODO: HACK
 		path = path.join(('<img src="', '" />'))

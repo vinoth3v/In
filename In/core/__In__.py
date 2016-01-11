@@ -15,6 +15,8 @@ class IN:
 	__root_path__ = None
 	__In_debug__ = True
 	
+	# manually set custom context for some processes. 
+	# be aware to change it once used.
 	__context__ = None
 	
 	def __init__(self):

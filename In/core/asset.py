@@ -48,7 +48,7 @@ class Asset:
 		
 		for key, css in container.items():
 			if css['type'] == 'file':
-				out.append(''.join(('<link type="text/css" rel="stylesheet" href="', cdn, css['css'], '?v=', version, '" media="', css['media'], '" />')))
+				out.append(''.join(('<link type="text/css" rel="stylesheet" href="//', cdn, css['css'], '?v=', version, '" media="', css['media'], '" />')))
 			elif css['type'] == 'inline':
 				if css['media'] == 'all':
 					out.append(css['css'].join(('<style type="text/css" >\n<!--\n', '\n//-->\n</style>')))
@@ -71,7 +71,7 @@ class Asset:
 		
 		for key, js in container.items():
 			if js['type'] == 'file':
-				out.append(''.join(('<script type="text/javascript" src="', cdn, js['js'], '?v=', version, '"></script>')))
+				out.append(''.join(('<script type="text/javascript" src="//', cdn, js['js'], '?v=', version, '"></script>')))
 			elif js['type'] == 'inline':
 				out.append(''.join(('<script type="text/javascript" >\n<!--\n', js['js'], '\n//-->\n</script>')))
 

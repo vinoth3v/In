@@ -102,7 +102,7 @@ class FormNabarRoleAccessAdmin(Form):
 
 			
 			value = [str(r) for r in access_roles.get(key, [])]
-
+			
 			keyset.add('CheckBoxes', {
 				'id' : '-'.join(('access', str(rid), key)),
 				'name' : ''.join(('access[', key, ']')),

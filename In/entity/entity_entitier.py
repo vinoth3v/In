@@ -97,19 +97,26 @@ class EntityEntitier(EntityEntitierBase):
 
 		if entity_data is None:
 			return None
-
+		
+		entity_type = self.entity_class.__type__
+		
 		#obj = self.entity_class(entity_data)
-		entity = self.entity_class.new(self.entity_class.__type__, entity_data)
+		entity = self.entity_class.new(entity_type, entity_data)
 
 		# load entity fields
 		db_loaded = {entity.id : entity}
 		self.__load_add_entity_fields__(db_loaded)
 
 		self.load_entity_additional_data(entity)
-
+		
 		if self.invoke_entity_hook:
-			IN.hook_invoke('_'.join(('entity_load', entity.__type__, entity.type)), entity)
-			IN.hook_invoke('entity_load_' + entity.__type__, entity)
+			
+			IN_hook_invoke = IN.hook_invoke
+			
+			hook_prefix = 'entity_load_' + entity_type
+			
+			IN.hook_invoke('_'.join((hook_prefix, entity.type)), entity)
+			IN.hook_invoke(hook_prefix, entity)
 
 			# heavy. dont implement
 			IN.hook_invoke('__entity_load__', entity)
@@ -138,17 +145,23 @@ class EntityEntitier(EntityEntitierBase):
 			return loaded
 
 		ids = list(ids)
-
+		
+		self_entity_class = self.entity_class
+		
 		# load data from db
-		db_loaded = self.entity_class.Model.load_multiple(ids)
-
+		db_loaded = self_entity_class.Model.load_multiple(ids)
+		
+		entity_type = self_entity_class.__type__
+		
+		self_entity_class_new = self_entity_class.new
+		
 		if db_loaded:
 			# initiate the Entities
 			for id, entity_data in db_loaded.items():
 				try:
 					# initiate the entity
 					#entity = self.entity_class(entity_data)
-					entity = self.entity_class.new(self.entity_class.__type__, entity_data)
+					entity = self_entity_class_new(entity_type, entity_data)
 					db_loaded[id] = entity
 				except Exception as e:
 					IN.logger.debug()
@@ -157,18 +170,21 @@ class EntityEntitier(EntityEntitierBase):
 			## add fields
 			self.__load_add_entity_fields__(db_loaded)
 
-
+			IN_hook_invoke = IN.hook_invoke
+			
+			hook_prefix = 'entity_load_' + entity_type
+			
 			for id, entity in db_loaded.items():
 				if entity:
 
 					self.load_entity_additional_data(entity)
 
 					if self.invoke_entity_hook:
-						IN.hook_invoke('_'.join(('entity_load', entity.__type__, entity.type)), entity)
-						IN.hook_invoke('entity_load_' + entity.__type__, entity)
+						IN_hook_invoke('_'.join((hook_prefix, entity.type)), entity)
+						IN_hook_invoke(hook_prefix, entity)
 
 						# heavy. dont implement
-						IN.hook_invoke('__entity_load__', entity)
+						IN_hook_invoke('__entity_load__', entity)
 
 					# set the cache
 					self.cacher.set(id, entity)
@@ -326,14 +342,20 @@ class EntityEntitier(EntityEntitierBase):
 					self.cacher.remove(entity.type)
 			except Exception:
 				IN.logger.debug()
-				
+			
 			# hook invoke
+			
 			if self.invoke_entity_hook:
-				IN.hook_invoke('_'.join(('entity_insert', entity.__type__, entity.type)), entity)
-				IN.hook_invoke('entity_insert_' + entity.__type__, entity)
+				
+				IN_hook_invoke = IN.hook_invoke
+				
+				hook_prefix = 'entity_insert_' + entity.__type__
+				
+				IN_hook_invoke('_'.join((hook_prefix, entity.type)), entity)
+				IN_hook_invoke(hook_prefix, entity)
 
-			# heavy. dont implement
-			IN.hook_invoke('__entity_insert__', entity)
+				# heavy. dont implement
+				IN_hook_invoke('__entity_insert__', entity)
 
 		return result
 
@@ -369,14 +391,21 @@ class EntityEntitier(EntityEntitierBase):
 		except Exception:
 			IN.logger.debug()
 		
+		
+		
 		# hook invoke
 		if self.invoke_entity_hook:
-			IN.hook_invoke('_'.join(('entity_update', entity.__type__, entity.type)), entity)
-			IN.hook_invoke('entity_update_' + entity.__type__, entity)
+			
+			IN_hook_invoke = IN.hook_invoke
+			
+			hook_prefix = 'entity_update_' + entity.__type__
+			
+			IN_hook_invoke('_'.join((hook_prefix, entity.type)), entity)
+			IN_hook_invoke(hook_prefix, entity)
 
-		# very heavy. dont implement
-		IN.hook_invoke('__entity_update__', entity)
-
+			# very heavy. dont implement
+			IN_hook_invoke('__entity_update__', entity)
+		
 		return result
 
 	def delete(self, entity, commit = True):
@@ -412,11 +441,16 @@ class EntityEntitier(EntityEntitierBase):
 		
 		# hook invoke
 		if self.invoke_entity_hook:
-			IN.hook_invoke('_'.join(('entity_delete', entity.__type__, entity.type)), entity)
-			IN.hook_invoke('entity_delete_' + entity.__type__, entity)
+			
+			IN_hook_invoke = IN.hook_invoke
+			
+			hook_prefix = 'entity_delete_' + entity.__type__
+			
+			IN_hook_invoke('_'.join((hook_prefix, entity.type)), entity)
+			IN_hook_invoke(hook_prefix, entity)
 
-		# heavy. dont implement
-		IN.hook_invoke('__entity_delete__', entity)
+			# heavy. dont implement
+			IN_hook_invoke('__entity_delete__', entity)
 
 		return result
 
@@ -430,10 +464,10 @@ class EntityEntitier(EntityEntitierBase):
 			return
 
 
-		id_suffix = '-'.join((entity.__type__, str(entity.id)))
+		#id_suffix = '-'.join((entity.__type__, str(entity.id)))
 
-		if context_type == 'links':
-			pass
+		#if context_type == 'links':
+			#pass
 			#if entitier.access('edit', entity):
 
 				#edit = Object.new(type = 'Link', data = {
@@ -457,10 +491,15 @@ class EntityEntitier(EntityEntitierBase):
 				#output[edit.id] = edit
 
 		# hook alter
-		IN.hook_invoke('_'.join(('entity_context_links', entity.__type__, entity.type)), entity, context_type, output, format, view_mode)
-		IN.hook_invoke('entity_context_links_' + entity.__type__, entity, context_type, output, format, view_mode)
+		
+		IN_hook_invoke = IN.hook_invoke
+		
+		hook_prefix = 'entity_context_links_' + entity.__type__
+		
+		IN_hook_invoke('_'.join((hook_prefix, entity.type)), entity, context_type, output, format, view_mode)
+		IN_hook_invoke(hook_prefix, entity, context_type, output, format, view_mode)
 		# heavy. dont implement
-		IN.hook_invoke('__entity_context_links__', entity, context_type, output, format, view_mode)
+		IN_hook_invoke('__entity_context_links__', entity, context_type, output, format, view_mode)
 
 		#(self, entity, context_type)
 

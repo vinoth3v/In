@@ -255,9 +255,23 @@ class WSGIApplication(Application):
 		#return [output] # Hello World test
 
 		# handle our own
+		
+		debug = 0
+		
+		if debug:
+			import cProfile, pstats, io
+			pr = cProfile.Profile()
+			pr.enable()
 
 		In_output = self.__run_call__(environ, start_response)
-
+		
+		if debug:
+			pr.disable()
+			s = io.StringIO()
+			sortby = 'cumulative'
+			ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+			ps.print_stats()
+			print(s.getvalue())
 
 		return In_output
 

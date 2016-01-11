@@ -17,8 +17,7 @@ def nabar_profile(nabar_id, profile_bundle):
 		['status', 1]
 	])
 	
-	
-	pprint('nabar profile ', nabar_id, profile_bundle, profiles)
+	#pprint('nabar profile ', nabar_id, profile_bundle, profiles)
 	
 	if not profiles:
 		return None
