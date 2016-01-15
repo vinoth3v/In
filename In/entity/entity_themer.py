@@ -44,9 +44,23 @@ class EntityThemer(EntityBaseThemer):
 		fielder = IN.fielder
 		entity_type = obj.__type__
 		entity_bundle = obj.type
+		
+		
+
+		# theme cache tokens
+		# TODO: static theme output cache
+		# -------------------------------
+		#theme_output = obj.theme_current_output
+		#tokens = theme_output['output']['tokens']
+		
+		#if entity_type not in tokens:
+			#tokens[entity_type] = []
+		
+		#tokens_entity_type = tokens[entity_type]
+		#tokens_entity_type.append(obj.id)
 
 		if entity_type not in fielder.entity_field_config:
-			# entity type not found
+			# NO Fields
 			return
 
 		entity_config = fielder.entity_field_config[entity_type]
@@ -105,12 +119,12 @@ class EntityThemer(EntityBaseThemer):
 		}
 
 		link = Object.new('EntityContextLinks', data)
-		menu = Object.new('EntityContextMenu', data)
-		tab = Object.new('EntityContextTab', data)
+		#menu = Object.new('EntityContextMenu', data)
+		#tab = Object.new('EntityContextTab', data)
 
 		theme = IN.themer.theme
 		args['entity_context_links'] = theme(link, format, 'lazy')
-		args['entity_context_menu'] = theme(menu, format, 'lazy')
+		#args['entity_context_menu'] = theme(menu, format, 'lazy')
 		#args['entity_context_tab'] = theme(tab, format, 'lazy')
 
 		if obj.created:

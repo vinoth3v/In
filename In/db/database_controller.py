@@ -1,5 +1,6 @@
 import importlib
 import random
+import datetime
 
 #from In.db.database_model_wrapper import *
 
@@ -180,7 +181,10 @@ class DatabaseController:
 		db_class = In.util.raw_eval('.'.join((settings['db_module'], settings['db_class'])))
 		
 		conn = db_class(settings)
-
+		
+		# may be used to close connections if opened so far
+		conn.timestamp = datetime.datetime.now()
+		
 		self.connections[target] = conn
 
 		return conn
@@ -198,6 +202,8 @@ class DatabaseController:
 	def execute(self, sql, args = None):
 		
 		conn =  self.connection
+		
+		conn.has_changes = True
 		
 		return conn.execute(sql, args)
 
@@ -221,15 +227,22 @@ class DatabaseController:
 		
 		conn = context.db_connections.pop()
 		if conn:
-			self.free_connections.append(conn)
 			
 			try:
 				# rollback
-				conn.rollback()
+				if conn.has_changes:
+					conn.rollback()
 			except Exception as e:
 				IN.logger.debug()
-				
-				
+			
+			if conn.timestamp < datetime.datetime.now() - datetime.timedelta(hours = 1):
+				try:
+					conn.close()
+				except Exception as e:
+					IN.logger.debug()
+			else:
+				self.free_connections.append(conn)
+			
 		# close others
 		for conn in context.db_connections:
 			try:
@@ -237,5 +250,5 @@ class DatabaseController:
 			except Exception as e:
 				IN.logger.debug()
 		
-		
+		context.db_connections = []
 		

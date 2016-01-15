@@ -1,6 +1,8 @@
 from In.core.application import Application
 from autobahn.asyncio.websocket import WebSocketServerFactory
 
+#import tracemalloc
+
 class WSApplication(WebSocketServerFactory, Application):
 	
 	
@@ -22,7 +24,31 @@ class WSApplication(WebSocketServerFactory, Application):
 		
 		#self.remaining_messages = 0
 		
+		#self.a = 0
+		
+		#tracemalloc.start()
+		
 	def __call__(self):
+		
+		
+		#try:
+			
+			#self.a += 1
+			
+			#if self.a == 5:
+				#self.snapshot = tracemalloc.take_snapshot()
+			#if self.a == 10:
+				#snapshot2 = tracemalloc.take_snapshot()
+
+				#top_stats = snapshot2.compare_to(self.snapshot, 'lineno')
+
+				#print("[ Top 10 differences ]")
+				#for stat in top_stats[:20]:
+					#print(stat)
+				
+
+		#except Exception as e:
+			#IN.logger.debug()
 		
 		# create context
 		protocol = In.abws.WSContext(self)

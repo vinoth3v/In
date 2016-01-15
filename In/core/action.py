@@ -314,7 +314,7 @@ class ActionObject:
 
 			#if self.arguments:
 				#self.params.update(self.arguments)
-
+			
 			self.result = self.handler(context, self, **self.handler_arguments)
 
 			return self.result

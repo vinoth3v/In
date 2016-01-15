@@ -22,7 +22,9 @@ class DBEngineBase:
 		like    = 'LIKE',
 		exists  = 'EXISTS',
 	)
-
+	
+	has_changes = False
+	
 	def __init__(self, db_settings):
 
 		self.__conn__ = None

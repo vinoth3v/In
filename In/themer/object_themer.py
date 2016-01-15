@@ -24,6 +24,8 @@ class ObjectThemer(ObjectThemerBase):
 		# we need this __init__
 		# dont remove
 
+
+		
 	def theme(self, obj, format, view_mode, args):
 		'''themer method is reponsible for themering IN 'Object' Object.
 
@@ -41,7 +43,20 @@ class ObjectThemer(ObjectThemerBase):
 
 		theme_output = obj.theme_current_output
 
-		theme_output['content']['value'] = obj.Themer.theme_value(obj, format, view_mode, args)
+		theme_output['content']['value'] = self.theme_value(obj, format, view_mode, args)
+		
+		## theme cache tokens
+		
+		#tokens = theme_output['output']['tokens']
+		
+		#obj_type = obj.__type__
+		
+		#if obj_type not in tokens:
+			#tokens[obj_type] = []
+		
+		#tokens_obj_type = tokens[obj_type]
+		#tokens_obj_type.append(obj.id)
+		
 
 	def theme_done(self, obj, format, view_mode, args):
 
@@ -189,12 +204,20 @@ class ObjectThemer(ObjectThemerBase):
 		
 		args['id'] = obj.id
 		
-		cdn = IN.APP.config.cdn
+		config = IN.APP.config
+		
+		cdn = config.cdn
 		
 		args['cdn_img'] = cdn['img']
 		args['cdn_css'] = cdn['css']
 		args['cdn_js'] = cdn['js']
-
+		
+		args['asset_version'] = config.asset_version
+		
+		args['files_path'] = config.pfpp
+		
+		args['files_path_version'] = '/'.join((config.pfpp, config.asset_version))
+		
 	def theme_plateit(self, obj, format, view_mode, args):
 
 		theme_output = obj.theme_current_output

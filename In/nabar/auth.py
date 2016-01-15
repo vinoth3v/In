@@ -675,7 +675,10 @@ class AccountAuth:
 		
 		path = self.nabar_profile_picture(nabar, profile_bundle, field)
 		if path:
-			return ''.join(('/files/public/style/', style, '/', path))
+			
+			asset_version = IN.APP.config.asset_version
+			
+			return ''.join(('/files/', asset_version, '/public/style/', style, '/', path))
 		else:
 			return ''
 		

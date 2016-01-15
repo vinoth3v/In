@@ -62,8 +62,10 @@ class Nabar(In.entity.Entity):
 	
 	def picture_uri(self, style = 'xsmall'):
 		
+		asset_version = IN.APP.config.asset_version
+		
 		if self.picture:
-			return ''.join(('/files/public/style/', style, '/', self.picture))
+			return ''.join(('/files/', asset_version, '/public/style/', style, '/', self.picture))
 		else:
 			return ''
 		
@@ -221,10 +223,17 @@ class NabarPicture(HTMLObject):
 	'''themeable nabar picture'''
 	
 	style = 'xsmall'
+	nabar = None
 	
 	def __init__(self, data = None, items = None, **args):
-		self.nabar = IN.nabar.anonymous()
+		
 		super().__init__(data, items, **args)
+		
+		if not self.nabar:
+			self.nabar = IN.nabar.anonymous()
+		
+		# always use nabar.id # theme cache
+		self.id = self.nabar.id
 		
 @IN.register('NabarPicture', type = 'Themer')
 class NabarPictureThemer(In.html.tags_themer.HTMLObjectThemer):
@@ -234,6 +243,23 @@ class NabarPictureThemer(In.html.tags_themer.HTMLObjectThemer):
 		obj.css.append('nabar-picture-' + obj.style)
 		
 		super().theme_prepare(obj, format, view_mode, args)
+		
+		# TODO: static theme output cache
+		# -------------------------------
+		#theme_output = obj.theme_current_output
+
+		## theme cache tokens
+		
+		#tokens = theme_output['output']['tokens']
+		
+		#obj_type = obj.__type__
+		
+		#if obj_type not in tokens:
+			#tokens[obj_type] = []
+		
+		#tokens_obj_type = tokens[obj_type]
+		#tokens_obj_type.append(obj.id)
+		
 		
 	def theme_process_variables(self, obj, format, view_mode, args):
 

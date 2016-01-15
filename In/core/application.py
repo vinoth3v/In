@@ -98,7 +98,9 @@ class Application(ApplicationBase):
 			#print(sys.exc_info()[0])
 			IN.logger.debug()
 			raise In.db.DBConnectionFailedException(e)
-
+		
+		IN.filer = In.filer.Filer()
+		
 		IN.stringer = In.stringer.Stringer()
 		IN.cacher = In.core.cacher.CacherEngine()
 
@@ -244,34 +246,31 @@ class WSGIApplication(Application):
 
 	def __call__(self, environ, start_response):
 
-		#time.sleep(.6)
-
 		#### Hello world test
-		#status = '200 OK'
 		#output = 'Hello World!'.encode('utf-8')
 		#response_headers = [('Content-type', 'text/plain'),
                         #('Content-Length', str(len(output)))]
-		#start_response(status, response_headers)
+		#start_response('200 OK', response_headers)
 		#return [output] # Hello World test
 
 		# handle our own
 		
-		debug = 0
+		#debug = 0
 		
-		if debug:
-			import cProfile, pstats, io
-			pr = cProfile.Profile()
-			pr.enable()
+		#if debug:
+			#import cProfile, pstats, io
+			#pr = cProfile.Profile()
+			#pr.enable()
 
 		In_output = self.__run_call__(environ, start_response)
 		
-		if debug:
-			pr.disable()
-			s = io.StringIO()
-			sortby = 'cumulative'
-			ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-			ps.print_stats()
-			print(s.getvalue())
+		#if debug:
+			#pr.disable()
+			#s = io.StringIO()
+			#sortby = 'cumulative'
+			#ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+			#ps.print_stats()
+			#print(s.getvalue())
 
 		return In_output
 

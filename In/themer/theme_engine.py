@@ -98,23 +98,26 @@ class INThemeEngine:
 		if 'context' not in args:
 			args['context'] = IN.context
 		
-		#if isinstance(obj, Object):
-		
 		obj_themer = obj.Themer
 		
 		# some themer may change view_mode
 		if obj_themer.__invoke_theme_format_view_mode_alter__:
 			format, view_mode = obj_themer.__theme_format_view_mode_alter__(format, view_mode, args)
 		
-		# static theme output cache
-		theme_cacher = obj.ThemeCacher
+		# TODO: static theme output cache
+		# -------------------------------
+		#theme_cacher = obj.ThemeCacher
 		
-		if theme_cacher.theme_cache_enabled:
-			cached_result = theme_cacher.get(obj, format, view_mode, args)
+		#if theme_cacher.theme_cache_enabled:
+			#cached_result = theme_cacher.get(obj, format, view_mode, args)
 			
-			if cached_result:
-				cached_result = theme_cacher.process_cached_output(obj, cached_result, format, view_mode, args)
-				return cached_result
+			#if cached_result:
+				## TODO: Do token replacement
+				#cached_result = theme_cacher.process_cached_output(obj, cached_result, format, view_mode, args)
+				
+				#return cached_result['final']
+		# --------------------------------
+		
 		
 		# TODO: it always raise error first time for all objects
 		#try:
@@ -215,12 +218,15 @@ class INThemeEngine:
 			IN.logger.debug()
 			theme_output = ''
 		
-		# theme cache set
-		if theme_output and theme_cacher.theme_cache_enabled and not cache_already_set:
-			try:
-				theme_cacher.set(obj, theme_output, format, view_mode, args)
-			except Exception as e:
-				IN.logger.debug()
+		# TODO: static theme output cache
+		# -------------------------------
+		## theme cache set
+		#if theme_output and theme_cacher.theme_cache_enabled and not cache_already_set:
+			#try:
+				#theme_cacher.set(obj, obj.theme_current_output['output'], format, view_mode, args)
+			#except Exception as e:
+				#IN.logger.debug()		
+		# -------------------------------
 		
 		try:
 			del args['__tpl_item_type__']
@@ -427,7 +433,8 @@ class INThemeEngine:
 						},
 						'output' : {
 							'children' : '', 			# optional children merged output
-							'final_output'	: '', 		# final output
+							'final'	: '', 		# final output
+							'tokens' : {}				# used to theme cache post process
 						}
 					}
 				}
@@ -447,7 +454,8 @@ class INThemeEngine:
 				},
 				'output' : {
 					'children' : '', 			# optional children merged output
-					'final_output'	: '', 		# final output
+					'final'	: '', 		# final output
+					'tokens' : {}				# used to theme cache post process
 				}
 			}
 		

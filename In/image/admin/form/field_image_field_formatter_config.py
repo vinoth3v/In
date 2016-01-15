@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from In.file.admin.form.field_file_field_formatter_config import FieldFileFieldFormatterConfigForm, FieldFileFieldFormatterConfigFormFormer
+from In.filer.admin.form.field_file_field_formatter_config import FieldFileFieldFormatterConfigForm, FieldFileFieldFormatterConfigFormFormer
 
 #********************************************************************
 #					FieldFormatterConfigForm

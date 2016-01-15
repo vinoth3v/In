@@ -1,4 +1,4 @@
-from In.file import FieldFileFieldFormatter
+from In.filer import FieldFileFieldFormatter
 
 @IN.register('FieldImage', type = 'FieldFormatter')
 class FieldImageFieldFormatter(FieldFileFieldFormatter):

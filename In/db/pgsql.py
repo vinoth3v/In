@@ -172,11 +172,13 @@ class PGSqlDBEngine(In.db.DBEngineBase):
 	def rollback(self):
 		'''Rollbacks the connection transactions.
 		'''
+		self.has_changes = False
 		self.__conn__.rollback()
 
 	def commit(self):
 		'''Commits the connection transactions.
 		'''
+		self.has_changes = False
 		self.__conn__.commit()
 
 	def prepare_connection(self, conn):

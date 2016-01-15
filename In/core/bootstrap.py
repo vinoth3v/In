@@ -98,7 +98,7 @@ import In.nabar
 
 import In.stringer
 
-import In.file
+import In.filer
 import In.image
 import In.core.valuator
 import In.core.cacher

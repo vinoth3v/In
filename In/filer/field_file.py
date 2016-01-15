@@ -27,7 +27,7 @@ class FieldFileFielder(FieldEntityReferenceFielder):
 			
 			path = field_value['path']
 			
-			return In.file.create_file_entity(path, self.default_file_bundle)
+			return IN.filer.create_file_entity(path, self.default_file_bundle)
 		
 	def __field_prepare_insert_update__(self, field):
 		'''prepare the field submit values to db insert/update'''

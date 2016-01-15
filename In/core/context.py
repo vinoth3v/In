@@ -571,4 +571,12 @@ class Context(greenlet.greenlet): # , asyncio.Task
 		del self.asset
 		del self.args
 		
+		del self.page_menu_tab
+		del self.page_menu_sub_tab
+		del self.page_menu_sub_tab_2
+		
+		del self.headers
+		del self.cookie
+		
+		del self.now
 		

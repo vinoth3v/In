@@ -214,7 +214,7 @@ class FormImageBrowserFormer(FormFormer):
 				
 				path = value['path']
 			
-				file_entity_id = In.file.create_file_entity(path, 'image')
+				file_entity_id = IN.filer.create_file_entity(path, 'image')
 				
 				if file_entity_id:
 					# list

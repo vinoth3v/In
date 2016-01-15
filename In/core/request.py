@@ -114,7 +114,7 @@ class Request:
 			
 			#pprint(post_data)
 			
-			process_file = In.file.process_uploaded_file
+			process_file = IN.filer.process_uploaded_file
 			process_it = lambda data: process_file(data) if data.filename else data.value
 
 			for key in post_data:

@@ -8,7 +8,7 @@ class FileImage(File):
 
 
 @IN.register('FileImage', type = 'Themer')
-class FileImageThemer(In.file.FileThemer):
+class FileImageThemer(In.filer.FileThemer):
 	'''File themer'''
 	
 	def view_modes(self):
@@ -25,13 +25,15 @@ class FileImageThemer(In.file.FileThemer):
 		config = IN.APP.config
 		cdn = config.cdn.get('img', '')
 		
+		asset_version = config.asset_version
+		
 		if not view_mode in config.image_style_filters:
 			view_mode = 'default'
 		
 		if obj.private:
-			path = ''.join(('//', cdn, '/files/private/style/', view_mode, '/', obj.path))
+			path = ''.join(('//', cdn, '/files/', asset_version, '/private/style/', view_mode, '/', obj.path))
 		else:
-			path = ''.join(('//', cdn, '/files/public/style/', view_mode, '/', obj.path))
+			path = ''.join(('//', cdn, '/files/', asset_version, '/public/style/', view_mode, '/', obj.path))
 	
 		# TODO: HACK
 		path = path.join(('<img src="', '" />'))

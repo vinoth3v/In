@@ -59,8 +59,6 @@ class ActivityThemer(In.entity.EntityThemer):
 	def theme(self, obj, format, view_mode, args):
 		super().theme(obj, format, view_mode, args)
 		
-		obj.css.append(obj.__type__)
-		obj.css.append('i-panel i-panel-box')
 		obj.css.append('i-margin-bottom')
 
 

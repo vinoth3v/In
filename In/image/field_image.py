@@ -1,7 +1,7 @@
 import sys, json
 from In.field import Field, FieldFielder
-from In.file import FieldFile, FieldFileFielder
-from In.file import FieldFileFieldFormatterConfigForm, FieldFileFieldFormatterConfigFormFormer
+from In.filer import FieldFile, FieldFileFielder
+from In.filer import FieldFileFieldFormatterConfigForm, FieldFileFieldFormatterConfigFormFormer
 
 class FieldImage(FieldFile):
 	'''EntityReference field'''
